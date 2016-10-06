@@ -96,8 +96,9 @@ end
 local function EnableProtectionMode(ent)
 	ent:SetNWBool("MG_Touchable", false)
 	ent:SetRenderMode(RENDERMODE_TRANSALPHA)
-	ent.MG_Color = ent:GetColor()
-	ent:SetColor(Color(255,255,255,200))
+	local color = ent:GetColor()
+	ent.MG_Color = color
+	ent:SetColor(Color(color.r,color.g,color.b,200))
 	ent:DrawShadow(false)
 	ent:SetCollisionGroup(COLLISION_GROUP_WORLD)
 	ent:CollisionRulesChanged()
