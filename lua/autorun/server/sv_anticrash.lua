@@ -23,8 +23,8 @@ local MG_BlockedEntityDamageList = { -- List of entities which should not damage
 	"gmod_*"
 }
 
-local MG_WhitelistedModelDamageList = { -- List of models, which should be able to damage players.
-	"models/props_junk/Shoe001a.mdl"
+local MG_WhitelistedModelDamageList = { -- List of models, which should be able to damage players. (must be in lower case)
+	"models/props_junk/shoe001a.mdl"
 }
 
 local MG_LanguageStrings = { -- Translate the addon.
@@ -204,8 +204,8 @@ if MG_DisableEntityDamage or MG_DisableVehicleDamage then
 		if dmg:GetDamageType() == DMG_CRUSH then
 			local ent = dmg:GetInflictor()
 			if !IsValid(ent) then return end
-			if table.HasValue(MG_WhitelistedModelDamageList, ent:GetModel()) then return end
 			if (MG_DisableVehicleDamage and ent:IsVehicle()) or (MG_DisableEntityDamage and table.HasValue(MG_BlockedEntityDamageList, ent:GetClass())) then
+				if table.HasValue(MG_WhitelistedModelDamageList, string.lower(ent:GetModel())) then return end
 				dmg:SetDamage(0)
 				dmg:ScaleDamage(0)
 				return true
