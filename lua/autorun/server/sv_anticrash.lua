@@ -200,7 +200,7 @@ if MG_DisablePropDamage or MG_DisableVehicleDamage then
 		if dmg:GetDamageType() == DMG_CRUSH then
 			local ent = dmg:GetInflictor()
 			if !IsValid(ent) then return end
-			if (MG_DisableVehicleDamage and ent:IsVehicle()) or (MG_DisablePropDamage and table.HasValue(MG_BlockedPropDamageList, ent:GetClass()) then
+			if (MG_DisableVehicleDamage and ent:IsVehicle()) or (MG_DisablePropDamage and table.HasValue(MG_BlockedPropDamageList, ent:GetClass())) then
 				dmg:SetDamage(0)
 				dmg:ScaleDamage(0)
 				return true
