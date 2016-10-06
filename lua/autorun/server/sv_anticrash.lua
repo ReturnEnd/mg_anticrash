@@ -75,7 +75,7 @@ if MG_FixButtonExploit then
 	end)
 end
 
-if MG_AllowPhysgunReload then
+if !MG_AllowPhysgunReload then
 	hook.Add("OnPhysgunReload", "AntiCrash_DisablePhysgunUnfreeze", function(g, ply)
 		return false
 	end)
