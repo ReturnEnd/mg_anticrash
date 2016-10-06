@@ -1,26 +1,30 @@
 --[[                          Made by mcNuggets aka deinemudda32                           ]]--
 --[[ Please dont re-credit this addon as yours, if you don't have my permissions to do so. ]]--
 
-local MG_FreezePropsOnServerLag = true -- Freeze props on server lag?
+local MG_FreezePropsOnServerLag = true -- Freeze props on heavy server lag?
 local MG_EnableAntiPropminge = true -- Disable prop minging?
 local MG_FreezeProps = true -- Freeze all props in a delay?
 local MG_FreezePropsTimer = 600 -- How often should props be frozen? (in seconds)
 local MG_FreezeMapProps = true -- Automatic freeze all map props?
-local MG_BlockBigSizeProps_FPP = true -- (FPP required) Block too big props?
-local MG_AllowPhysgunReload = false -- Should Players be allowed to use the Reloadfunction of the Physics Gun?
+local MG_BlockBigSizeProps_FPP = true -- (FPP required) Block too big props automatically?
+local MG_AllowPhysgunReload = false -- Should players be allowed to use the reload function of the "Physics Gun"?
 local MG_FixButtonExploit = true -- I know it is not really a real exploit, but this is one of the things, this addon doesn't fix up. If you find a better way, tell me.
-local MG_DisablePropDamage = false -- Should Players receive prop damage?
-local MG_DisableVehicleDamage = false -- Should Players receive vehicle damage?
-local MG_AllowPhysgunWorld = false -- Should Players be allowed to physgun world entities?
-local MG_AllowToolGunWorld = false -- Should Players be allowed to use toolgun on world entities?
-local MG_AllowPropertyWorld = false -- Should Players be allowed to use properties on world entities?
+local MG_DisableEntityDamage = false -- Should players receive damage from specific entities?
+local MG_DisableVehicleDamage = false -- Should players receive damage from vehicles?
+local MG_AllowPhysgunWorld = false -- Should players be allowed to physgun world entities?
+local MG_AllowToolGunWorld = false -- Should players be allowed to use their toolgun on world entities?
+local MG_AllowPropertyWorld = false -- Should players be allowed to use the propertysystem on world entities?
 
-local MG_DarkRPNotifications = true -- Display DarkRP-Notifications instead of using meta:ChatPrint("")?
+local MG_DarkRPNotifications = true -- Display DarkRP-notifications instead of using "meta:ChatPrint(text)"?
 
-local MG_BlockedPropDamageList = { -- List of entities which should not damage players.
+local MG_BlockedEntityDamageList = { -- List of entities which should not damage players at all.
 	"prop_physics",
 	"prop_physics_multiplayer",
 	"gmod_*"
+}
+
+local MG_WhitelistedModelDamageList = { -- List of models, which should be able to damage players.
+	"models/props_junk/Shoe001a.mdl"
 }
 
 local MG_LanguageStrings = { -- Translate the addon.
@@ -195,12 +199,13 @@ if MG_FreezeProps then
 	end)
 end
 
-if MG_DisablePropDamage or MG_DisableVehicleDamage then
+if MG_DisableEntityDamage or MG_DisableVehicleDamage then
 	hook.Add("EntityTakeDamage", "AntiCrash_DisableKilling", function(target, dmg)
 		if dmg:GetDamageType() == DMG_CRUSH then
 			local ent = dmg:GetInflictor()
 			if !IsValid(ent) then return end
-			if (MG_DisableVehicleDamage and ent:IsVehicle()) or (MG_DisablePropDamage and table.HasValue(MG_BlockedPropDamageList, ent:GetClass())) then
+			if table.HasValue(MG_WhitelistedModelDamageList, ent:GetModel()) then return end
+			if (MG_DisableVehicleDamage and ent:IsVehicle()) or (MG_DisableEntityDamage and table.HasValue(MG_BlockedEntityDamageList, ent:GetClass())) then
 				dmg:SetDamage(0)
 				dmg:ScaleDamage(0)
 				return true
