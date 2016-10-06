@@ -94,6 +94,7 @@ if !MG_AllowPhysgunReload then
 end
 
 local function EnableProtectionMode(ent)
+	ent:SetNWBool("MG_Touchable", false)
 	ent:SetRenderMode(RENDERMODE_TRANSALPHA)
 	ent.MG_Color = ent:GetColor()
 	ent:SetColor(Color(255,255,255,200))
@@ -103,6 +104,7 @@ local function EnableProtectionMode(ent)
 end
 
 local function DisableProtectionMode(ent)
+	ent:SetNWBool("MG_Touchable", false)
 	ent:SetRenderMode(RENDERMODE_NORMAL)
 	ent:SetColor(ent.MG_Color or Color(255,255,255,255))
 	ent:DrawShadow(true)
@@ -126,7 +128,6 @@ if MG_EnableAntiPropminge then
 
 	hook.Add("PhysgunPickup", "AntiCrash_EnableProtectionMode", function(ply, ent)
 		if ent:GetClass() != "prop_physics" or ent.protected then return end
-		if ent.CPPIGetOwner and ent:CPPIGetOwner() != ply then return end
 		if !MG_PhysgunWorld and ent:CreatedByMap() then return end
 		ent.protected = true
 		EnableProtectionMode(ent)
@@ -172,7 +173,6 @@ end
 if MG_FreezeProps then
 	hook.Add("PhysgunPickup", "AntiCrash_PickUpCheck", function(ply, ent)
 		if ent:GetClass() != "prop_physics" then return end
-		if ent.CPPIGetOwner and ent:CPPIGetOwner() != ply then return end
 		if !MG_PhysgunWorld and ent:CreatedByMap() then return end
 		ent.picked = true
 	end)
