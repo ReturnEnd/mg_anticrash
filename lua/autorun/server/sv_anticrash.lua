@@ -8,7 +8,7 @@ local MG_FreezePropsTimer = 600 -- How often should props be frozen? (in seconds
 local MG_FreezeMapProps = true -- Automatic freeze all map props?
 local MG_BlockBigSizeProps_FPP = true -- (FPP required) Block too big props?
 local MG_AllowPhysgunReload = false -- Should Players be allowed to use the Reloadfunction of the Physics Gun?
-local MG_FixButtonExploit = true -- I know it is not really a real exploit, but is one of the things, this addon doesn't fix up. If you find a better way, tell me.
+local MG_FixButtonExploit = true -- I know it is not really a real exploit, but this is one of the things, this addon doesn't fix up. If you find a better way, tell me.
 local MG_DisablePropDamage = false -- Should Players receive prop damage?
 local MG_DisableVehicleDamage = false -- Should Players receive vehicle damage?
 local MG_AllowPhysgunWorld = false -- Should Players be allowed to physgun world entities?
@@ -17,7 +17,13 @@ local MG_AllowPropertyWorld = false -- Should Players be allowed to use properti
 
 local MG_DarkRPNotifications = true -- Display DarkRP-Notifications instead of using meta:ChatPrint("")?
 
-local MG_LanguageStrings = {
+local MG_BlockedPropDamageList = { -- List of entities which should not damage players.
+	"prop_physics",
+	"prop_physics_multiplayer"
+	"gmod_*"
+}
+
+local MG_LanguageStrings = { -- Translate the addon.
 	"Please don't use button models, rather the standard ones!",
 	"There is a player stucking in this prop!",
 	"This prop is now blocked. Thank you!",
@@ -193,7 +199,9 @@ end
 if MG_DisablePropDamage or MG_DisableVehicleDamage then
 	hook.Add("EntityTakeDamage", "AntiCrash_DisableKilling", function(target, dmg)
 		if dmg:GetDamageType() == DMG_CRUSH then
-			if (MG_DisableVehicleDamage and dmg:GetInflictor():IsVehicle()) or (MG_DisablePropDamage and dmg:GetInflictor():GetClass() == "prop_physics") then
+			local ent = dmg:GetInflictor()
+			if !IsValid(ent) then return end
+			if (MG_DisableVehicleDamage and ent:IsVehicle()) or (MG_DisablePropDamage and table.HasValue(MG_BlockedPropDamageList, ent:GetClass()) then
 				dmg:SetDamage(0)
 				dmg:ScaleDamage(0)
 				return true
