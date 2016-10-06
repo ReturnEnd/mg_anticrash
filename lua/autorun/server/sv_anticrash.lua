@@ -128,6 +128,7 @@ if MG_EnableAntiPropminge then
 
 	hook.Add("PhysgunPickup", "AntiCrash_EnableProtectionMode", function(ply, ent)
 		if ent:GetClass() != "prop_physics" or ent.protected then return end
+		if ent.CPPICanPhysgun and !ent:CPPICanPhysgun(ply) then return end
 		if !MG_PhysgunWorld and ent:CreatedByMap() then return end
 		ent.protected = true
 		EnableProtectionMode(ent)
@@ -168,11 +169,18 @@ if MG_EnableAntiPropminge then
 			DisableProtectionMode(ent)
 		end
 	end)
+
+	hook.Add("PlayerUnfrozeObject", "AntiCrash_DisableProtectionMode", function(ply, ent)
+		if ent:GetClass() != "prop_physics" or ent.protected then return end
+		ent.protected = true
+		EnableProtectionMode(ent)
+	end)
 end
 
 if MG_FreezeProps then
 	hook.Add("PhysgunPickup", "AntiCrash_PickUpCheck", function(ply, ent)
 		if ent:GetClass() != "prop_physics" then return end
+		if ent.CPPICanPhysgun and !ent:CPPICanPhysgun(ply) then return end
 		if !MG_PhysgunWorld and ent:CreatedByMap() then return end
 		ent.picked = true
 	end)
