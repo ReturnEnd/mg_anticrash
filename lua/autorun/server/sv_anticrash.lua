@@ -15,16 +15,18 @@ local MG_AllowPhysgunWorld = false -- Should players be allowed to physgun world
 local MG_AllowToolGunWorld = false -- Should players be allowed to use their toolgun on world entities?
 local MG_AllowPropertyWorld = false -- Should players be allowed to use the propertysystem on world entities?
 
-local MG_DarkRPNotifications = true -- Display DarkRP-notifications instead of using "meta:ChatPrint(text)"?
+local MG_DarkRPNotifications = false -- Display DarkRP-notifications instead of using "meta:ChatPrint(text)"?
 
-local MG_BlockedEntityDamageList = { -- List of entities which should not damage players at all.
+local MG_BlockedEntityDamageList = {
 	"prop_physics",
 	"prop_physics_multiplayer",
-	"gmod_*"
-}
-
-local MG_WhitelistedModelDamageList = { -- List of models, which should be able to damage players. (must be in lower case)
-	"models/props_junk/shoe001a.mdl"
+	"gmod_balloon",
+	"gmod_button",
+	"gmod_thruster",
+	"gmod_light",
+	"gmod_lamp",
+	"gmod_wheel",
+	"gmod_hoverball"
 }
 
 local MG_LanguageStrings = { -- Translate the addon.
@@ -205,7 +207,6 @@ if MG_DisableEntityDamage or MG_DisableVehicleDamage then
 			local ent = dmg:GetInflictor()
 			if !IsValid(ent) then return end
 			if (MG_DisableVehicleDamage and ent:IsVehicle()) or (MG_DisableEntityDamage and table.HasValue(MG_BlockedEntityDamageList, ent:GetClass())) then
-				if table.HasValue(MG_WhitelistedModelDamageList, string.lower(ent:GetModel())) then return end
 				dmg:SetDamage(0)
 				dmg:ScaleDamage(0)
 				return true
