@@ -94,7 +94,7 @@ if !MG_AllowPhysgunReload then
 end
 
 local function EnableProtectionMode(ent)
-	ent:SetNWBool("MG_Touchable", false)
+	ent:SetNWBool("MG_Blocked", true)
 	ent:SetRenderMode(RENDERMODE_TRANSALPHA)
 	local color = ent:GetColor()
 	ent.MG_Color = color
@@ -105,7 +105,7 @@ local function EnableProtectionMode(ent)
 end
 
 local function DisableProtectionMode(ent)
-	ent:SetNWBool("MG_Touchable", true)
+	ent:SetNWBool("MG_Blocked", false)
 	ent:SetRenderMode(RENDERMODE_NORMAL)
 	ent:SetColor(ent.MG_Color or Color(255,255,255,255))
 	ent:DrawShadow(true)
