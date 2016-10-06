@@ -105,7 +105,6 @@ local function DisableProtectionMode(ent)
 end
 
 if MG_EnableAntiPropminge then
-
 	hook.Add("PlayerSpawnedProp", "AntiCrash_EnableProtectionMode", function(ply, model, ent)
 		timer.Simple(0, function()
 			if !IsValid(ent) then return end
