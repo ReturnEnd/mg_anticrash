@@ -19,7 +19,7 @@ local MG_DarkRPNotifications = true -- Display DarkRP-Notifications instead of u
 
 local MG_BlockedPropDamageList = { -- List of entities which should not damage players.
 	"prop_physics",
-	"prop_physics_multiplayer"
+	"prop_physics_multiplayer",
 	"gmod_*"
 }
 
