@@ -17,7 +17,7 @@ local MG_AllowPropertyWorld = false -- Should players be allowed to use the prop
 
 local MG_DarkRPNotifications = false -- Display DarkRP-notifications instead of using "meta:ChatPrint(text)"?
 
-local MG_BlockedEntityDamageList = {
+local MG_BlockedEntityDamageList = { -- List of entities, which should not damage players.
 	"prop_physics",
 	"prop_physics_multiplayer",
 	"gmod_balloon",
@@ -30,8 +30,8 @@ local MG_BlockedEntityDamageList = {
 }
 
 local MG_LanguageStrings = { -- Translate the addon.
-	"Please don't use button models, rather the standard ones!",
-	"There is a player stucking in this prop!",
+	"Please use the standard button models!",
+	"There is a player stuck in this prop!",
 	"This prop is now blocked. Thank you!",
 }
 
