@@ -1,11 +1,11 @@
 --[[                          Made by mcNuggets aka deinemudda32                           ]]--
 --[[ Please dont re-credit this addon as yours, if you don't have my permissions to do so. ]]--
 
-local MG_FreezePropsOnServerLag = true -- Freeze props on heavy server lag?
+local MG_FreezeEntitiesOnServerLag = true -- Freeze props on heavy server lag?
 local MG_EnableAntiPropminge = true -- Disable prop minging?
-local MG_FreezeProps = true -- Freeze all props in a delay?
-local MG_FreezePropsTimer = 600 -- How often should props be frozen? (in seconds)
-local MG_FreezeMapProps = true -- Automatic freeze all map props?
+local MG_FreezeEntities = true -- Freeze all props in a delay?
+local MG_FreezeEntitiesTimer = 600 -- How often should props be frozen? (in seconds)
+local MG_FreezeMapEntities = true -- Automatic freeze all map props?
 local MG_BlockBigSizeProps_FPP = true -- (FPP required) Block too big props automatically?
 local MG_AllowPhysgunReload = false -- Should players be allowed to use the reload function of the "Physics Gun"?
 local MG_FixButtonExploit = true -- I know it is not really a real exploit, but this is one of the things, this addon doesn't fix up. If you find a better way, tell me.
@@ -16,6 +16,11 @@ local MG_AllowToolGunWorld = false -- Should players be allowed to use their too
 local MG_AllowPropertyWorld = false -- Should players be allowed to use the propertysystem on world entities?
 
 local MG_DarkRPNotifications = false -- Display DarkRP-notifications instead of using "meta:ChatPrint(text)"?
+
+local MG_FreezeEntityList = { -- List of entities, which should be frozen on map start or on specified time delay.
+	"prop_physics",
+	"prop_physics_multiplayer"
+}
 
 local MG_BlockedEntityDamageList = { -- List of entities, which should not damage players.
 	"prop_physics",
@@ -178,7 +183,7 @@ if MG_EnableAntiPropminge then
 	end)
 end
 
-if MG_FreezeProps then
+if MG_FreezeEntities then
 	hook.Add("PhysgunPickup", "AntiCrash_PickUpCheck", function(ply, ent)
 		if ent:GetClass() != "prop_physics" then return end
 		if ent.CPPICanPhysgun and !ent:CPPICanPhysgun(ply) then return end
@@ -211,7 +216,7 @@ if MG_FreezeProps then
 end
 
 if MG_DisableEntityDamage or MG_DisableVehicleDamage then
-	hook.Add("EntityTakeDamage", "AntiCrash_DisableKilling", function(target, dmg)
+	hook.Add("EntityTakeDamage", "AntiCrash_DisableEntityKilling", function(target, dmg)
 		if dmg:GetDamageType() == DMG_CRUSH then
 			local ent = dmg:GetInflictor()
 			if !IsValid(ent) then return end
@@ -258,34 +263,35 @@ if MG_BlockBigSizeProps_FPP then
 	end)
 end
 
-local function AntiCrash_FreezeEntities(name)
-	for k,v in pairs(ents.FindByClass(name)) do
-		if v.picked then continue end
-		if MG_EnableAntiPropminge then
-			v.protected = nil
-			DisableProtectionMode(v)
-		end
-		local phys = v:GetPhysicsObject()
-		if IsValid(phys) then
-			phys:EnableMotion(false)
+local function AntiCrash_FreezeEntities(force)
+	for _,s in pairs(MG_FreezeEntityList) do
+		for _,v in pairs(s) do
+			if !force and v.picked then continue end
+			if MG_EnableAntiPropminge and v.protected then
+				v.protected = nil
+				DisableProtectionMode(v)
+			end
+			local phys = v:GetPhysicsObject()
+			if IsValid(phys) then
+				phys:EnableMotion(false)
+			end
 		end
 	end
 end
 
-if MG_FreezeMapProps then
-	timer.Create("AntiCrash_FreezeMapProps", 1, 1, function()
-		AntiCrash_FreezeEntities("prop_physics")
-		AntiCrash_FreezeEntities("prop_physics_multiplayer")
+if MG_FreezeMapEntities then
+	timer.Create("AntiCrash_FreezeMapEntities", 1, 1, function()
+		AntiCrash_FreezeEntities(false)
 	end)
 end
 
-if MG_FreezeProps then
-	timer.Create("AntiCrash_FreezeProps", MG_FreezePropsTimer, 0, function()
-		AntiCrash_FreezeEntities("prop_physics")
+if MG_FreezeEntities then
+	timer.Create("AntiCrash_FreezeProps", MG_FreezeEntitiesTimer, 0, function()
+		AntiCrash_FreezeEntities(false)
 	end)
 end
 
-if MG_FreezePropsOnServerLag then
+if MG_FreezeEntitiesOnServerLag then
 	timer.Simple(10, function()
 		local maxlongs = 3 -- You may play with these values to find the best matching one!
 		local sensitivity = 15
@@ -299,12 +305,7 @@ if MG_FreezePropsOnServerLag then
 			if rate < tickrate / sensitivity then
 				counter = counter + 1
 				if counter >= maxlongs then
-					for _,p in pairs(ents.FindByClass("prop_physics")) do
-						local phys = p:GetPhysicsObject()
-						if IsValid(phys) then
-							phys:EnableMotion(false)
-						end
-					end
+					AntiCrash_FreezeEntities(true)
 					MsgN("[MG] Froze all props due to server lag.")
 					counter = 0
 				end
