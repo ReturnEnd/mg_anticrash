@@ -265,7 +265,7 @@ end
 
 local function AntiCrash_FreezeEntities(force)
 	for _,s in pairs(MG_FreezeEntityList) do
-		for _,v in pairs(s) do
+		for _,v in pairs(ents.FindByClass(s)) do
 			if !force and v.picked then continue end
 			if MG_EnableAntiPropminge and v.protected then
 				v.protected = nil
