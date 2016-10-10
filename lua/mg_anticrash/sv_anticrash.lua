@@ -1,3 +1,5 @@
+-- Dont edit this file without knowing what you are doing!
+
 if !MG.PhysgunWorld or !MG.ToolgunWorld then
 	hook.Add("InitPostEntity", "AntiCrash_BlockWorldEntities", function()
 		for k,v in pairs(ents.GetAll()) do
