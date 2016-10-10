@@ -21,7 +21,7 @@ MG.AllowPhysgunOnWorld = false -- Should it be allowed to physgun world entities
 MG.AllowToolgunOnWorld = false -- Should it be allowed to use the toolgun on world entities?
 MG.AllowPropertyOnWorld = false -- Should it be allowed to use the property system on world entities?
 
-MG.DarkRPNotifications = true -- Display DarkRP-notifications instead of using the ChatPrint function? (DarkRP required)
+MG.DarkRPNotifications = false -- Display DarkRP-notifications instead of using the ChatPrint function? (DarkRP required)
 
 MG.AllowedTools = { -- Which tools should be allowed to be used on ghosted entities?
 	"remover"
