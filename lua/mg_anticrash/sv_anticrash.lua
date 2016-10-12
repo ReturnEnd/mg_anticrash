@@ -38,7 +38,7 @@ local function EnableProtectionMode(ent)
 	ent:SetColor(Color(color.r,color.g,color.b,200))
 	ent.MG_CollisionGroup = ent:GetCollisionGroup()
 	ent:SetCollisionGroup(COLLISION_GROUP_WORLD)
-	ent:DrawShadow(false
+	ent:DrawShadow(false)
 	ent:CollisionRulesChanged()
 end
 
@@ -48,8 +48,8 @@ local function DisableProtectionMode(ent)
 	end
 	ent:SetRenderMode(ent.MG_RenderMode or RENDERMODE_NORMAL)
 	ent:SetColor(ent.MG_Color or Color(255,255,255,255))
-	ent:DrawShadow(true)
 	ent:SetCollisionGroup(ent.MG_CollisionGroup or COLLISION_GROUP_NONE)
+	ent:DrawShadow(true)
 	ent:CollisionRulesChanged()
 end
 
