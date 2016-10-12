@@ -31,12 +31,14 @@ local function EnableProtectionMode(ent)
 	if MG.BlockToolsOnGhostEntities then
 		ent:SetNWBool("MG_T_Blocked", true)
 	end
+	ent.MG_RenderMode = ent:GetRenderMode()
 	ent:SetRenderMode(RENDERMODE_TRANSALPHA)
 	local color = ent:GetColor()
 	ent.MG_Color = color
 	ent:SetColor(Color(color.r,color.g,color.b,200))
-	ent:DrawShadow(false)
+	ent.MG_CollisionGroup = ent:GetCollisionGroup()
 	ent:SetCollisionGroup(COLLISION_GROUP_WORLD)
+	ent:DrawShadow(false
 	ent:CollisionRulesChanged()
 end
 
@@ -44,10 +46,10 @@ local function DisableProtectionMode(ent)
 	if MG.BlockToolsOnGhostEntities then
 		ent:SetNWBool("MG_T_Blocked", false)
 	end
-	ent:SetRenderMode(RENDERMODE_NORMAL)
+	ent:SetRenderMode(ent.MG_RenderMode or RENDERMODE_NORMAL)
 	ent:SetColor(ent.MG_Color or Color(255,255,255,255))
 	ent:DrawShadow(true)
-	ent:SetCollisionGroup(COLLISION_GROUP_NONE)
+	ent:SetCollisionGroup(ent.MG_CollisionGroup or COLLISION_GROUP_NONE)
 	ent:CollisionRulesChanged()
 end
 
