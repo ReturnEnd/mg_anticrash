@@ -1,15 +1,13 @@
 -- Dont edit this file without knowing what you are doing!
 
 if !MG.PhysgunWorld or !MG.ToolgunWorld then
-	hook.Add("InitPostEntity", "AntiCrash_BlockWorldEntities", function()
-		for k,v in pairs(ents.GetAll()) do
-			if v:CreatedByMap() then
-				if !MG.PhysgunWorld then
-					v:SetNWBool("MG_P_Blocked", true)
-				end
-				if !MG.ToolgunWorld then
-					v:SetNWBool("MG_T_Blocked_S", true)
-				end
+	hook.Add("OnEntityCreated", "AntiCrash_BlockWorldEntities", function(ent)
+		if ent:CreatedByMap() then
+			if !MG.PhysgunWorld then
+				ent:SetNWBool("MG_P_Blocked", true)
+			end
+			if !MG.ToolgunWorld then
+				ent:SetNWBool("MG_T_Blocked_S", true)
 			end
 		end
 	end)
