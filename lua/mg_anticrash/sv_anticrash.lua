@@ -2,14 +2,17 @@
 
 if !MG.PhysgunWorld or !MG.ToolgunWorld then
 	hook.Add("OnEntityCreated", "AntiCrash_BlockWorldEntities", function(ent)
-		if ent:CreatedByMap() then
-			if !MG.PhysgunWorld then
-				ent:SetNWBool("MG_P_Blocked", true)
+		timer.Simple(0, function()
+			if !IsValid(ent) then return end
+			if ent:CreatedByMap() then
+				if !MG.PhysgunWorld then
+					ent:SetNWBool("MG_P_Blocked", true)
+				end
+				if !MG.ToolgunWorld then
+					ent:SetNWBool("MG_T_Blocked_S", true)
+				end
 			end
-			if !MG.ToolgunWorld then
-				ent:SetNWBool("MG_T_Blocked_S", true)
-			end
-		end
+		end)
 	end)
 end
 
