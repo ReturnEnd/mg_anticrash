@@ -66,7 +66,6 @@ if MG.EnableAntiPropminge then
 					local phys = ent:GetPhysicsObject()
 					if IsValid(phys) and phys:IsMotionEnabled() then
 						phys:EnableMotion(false)
-						print("!")
 					end
 				end
 			end)
