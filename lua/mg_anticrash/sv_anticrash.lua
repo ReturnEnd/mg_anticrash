@@ -75,7 +75,7 @@ if MG.EnableAntiPropminge then
 	hook.Add("PlayerSpawnedProp", "AntiCrash_EnableProtectionMode", function(ply, model, ent)
 		timer.Simple(0, function()
 			if !IsValid(ent) then return end
-			if FPP.UnGhost then
+			if FPP and FPP.UnGhost then
 				FPP.UnGhost(ply, ent)
 			end
 			local phys = ent:GetPhysicsObject()
