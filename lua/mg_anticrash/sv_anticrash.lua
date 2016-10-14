@@ -57,6 +57,22 @@ local function DisableProtectionMode(ent)
 end
 
 if MG.EnableAntiPropminge then
+	hook.Add("CanTool", "AntiCrash_WeldWorkaround", function(ply, tr, tool)
+		if IsValid(tr.Entity) and tool == "weld" then
+			local ent = tr.Entity
+			if FPP.canTouchEnt and !FPP.canTouchEnt(trace.Entity, "Toolgun") then return end
+			timer.Simple(0, function()
+				if IsValid(ent) then
+					local phys = ent:GetPhysicsObject()
+					if IsValid(phys) and phys:IsMotionEnabled() then
+						phys:EnableMotion(false)
+						print("!")
+					end
+				end
+			end)
+		end
+	end)
+
 	hook.Add("PlayerSpawnedProp", "AntiCrash_EnableProtectionMode", function(ply, model, ent)
 		timer.Simple(0, function()
 			if !IsValid(ent) then return end
