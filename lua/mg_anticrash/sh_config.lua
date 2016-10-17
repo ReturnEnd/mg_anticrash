@@ -1,7 +1,7 @@
 --[[                          Made by mcNuggets aka deinemudda32                           ]]--
 --[[ Please dont re-credit this addon as yours, if you don't have my permissions to do so. ]]--
 
-MG = {}
+MG = MG or {}
 
 MG.FreezeAllPropsOnServerLag = true -- Freeze props on heavily server lag?
 MG.MaxLongs = 3 -- Adjust.
