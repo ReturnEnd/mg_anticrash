@@ -58,7 +58,7 @@ end
 
 if MG.EnableAntiPropminge then
 	hook.Add("CanTool", "AntiCrash_WeldWorkaround", function(ply, tr, tool)
-		if IsValid(tr.Entity) and tool == "weld" then
+		if IsValid(tr.Entity) and (tool == "weld" or tool == "precision") then
 			local ent = tr.Entity
 			if FPP.canTouchEnt and !FPP.canTouchEnt(trace.Entity, "Toolgun") then return end
 			timer.Simple(0, function()
