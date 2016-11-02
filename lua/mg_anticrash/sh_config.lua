@@ -7,6 +7,7 @@ MG.FreezeAllPropsOnServerLag = true -- Freeze props on heavily server lag?
 MG.MaxLongs = 3 -- Adjust.
 MG.Sensitivity = 15 -- Adjust.
 MG.EnableAntiPropminge = true -- Disable minging around with props? (Disables collision, when props are unfrozen)
+MG.EnablePropCollide = false -- Enable collision between two props.
 MG.BlockToolsOnGhostEntities = true -- Block tool usage on ghosted entities?
 MG.FreezeSpecificEntities = true -- Freeze specified entities in a delay?
 MG.FreezeSpecificEntitiesTimer = 600 -- In what delay the entities should be frozen?

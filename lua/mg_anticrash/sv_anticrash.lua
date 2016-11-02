@@ -40,7 +40,11 @@ local function EnableProtectionMode(ent)
 	ent.MG_Color = color
 	ent:SetColor(Color(color.r,color.g,color.b,200))
 	ent.MG_CollisionGroup = ent:GetCollisionGroup()
-	ent:SetCollisionGroup(COLLISION_GROUP_WORLD)
+	if MG.EnablePropCollide then
+		ent:SetCollisionGroup(COLLISION_GROUP_WEAPON)
+	else
+		ent:SetCollisionGroup(COLLISION_GROUP_WORLD)
+	end
 	ent:DrawShadow(false)
 	ent:CollisionRulesChanged()
 end
@@ -72,6 +76,26 @@ if MG.EnableAntiPropminge then
 		end
 	end)
 
+	local function CheckForStuckingPlayers(ent)
+		local mins, maxs, check = ent:OBBMins(), ent:OBBMaxs(), false
+		local tr = {start = ent:LocalToWorld(mins), endpos = ent:LocalToWorld(maxs), filter = ent}
+		local trace = util.TraceLine(tr)
+		check = IsValid(trace.Entity) and trace.Entity:IsPlayer() or false
+		if check then return check end
+		local pos = ent:GetPos()
+		tr = {start = pos, endpos = pos, filter = ent, mins = ent:OBBMins(), maxs = ent:OBBMaxs()}
+		trace = util.TraceHull(tr)
+		check = IsValid(trace.Entity) and trace.Entity:IsPlayer() or false
+		if check then return check end
+		local cube = ents.FindInBox(ent:LocalToWorld(mins), ent:LocalToWorld(maxs))
+		for _,v in pairs(cube) do
+			if v:IsPlayer() and v:Alive() then
+				return true
+			end
+		end
+		return false
+	end
+
 	hook.Add("PlayerSpawnedProp", "AntiCrash_EnableProtectionMode", function(ply, model, ent)
 		timer.Simple(0, function()
 			if !IsValid(ent) then return end
@@ -80,7 +104,7 @@ if MG.EnableAntiPropminge then
 			end
 			local phys = ent:GetPhysicsObject()
 			if IsValid(phys) then
-				if phys:IsMotionEnabled() then
+				if phys:IsMotionEnabled() or CheckForStuckingPlayers(ent) == true then
 					ent.protected = true
 					EnableProtectionMode(ent)
 				end
@@ -95,26 +119,6 @@ if MG.EnableAntiPropminge then
 		ent.protected = true
 		EnableProtectionMode(ent)
 	end)
-
-	local function CheckForStuckingPlayers(ent)
-		local mins, maxs, check = ent:OBBMins(), ent:OBBMaxs(), false
-		local tr = {start = ent:LocalToWorld(mins), endpos = ent:LocalToWorld(maxs), filter = ent}
-		local trace = util.TraceLine(tr)
-		check = IsValid(trace.Entity) and trace.Entity:IsPlayer() or false
-		if check then return check end
-		local pos = ent:GetPos()
-		tr = {start = pos, endpos = pos, filter = ent, mins = ent:OBBMins(), maxs = ent:OBBMaxs()}
-		trace = util.TraceHull(tr)
-		check = IsValid(trace.Entity) and trace.Entity:IsPlayer() or false
-		if check then return check end
-		local cube = ents.FindInBox(ent:LocalToWorld(mins), ent:LocalToWorld(maxs))
-		for _,v in pairs(cube) do
-			if v:IsPlayer() then
-				return true
-			end
-		end
-		return false
-	end
 
 	hook.Add("OnPhysgunFreeze", "AntiCrash_DisableProtectionMode", function(weapon, physobj, ent, ply)
 		if ent:GetClass() != "prop_physics" or !ent.protected then return end
@@ -164,14 +168,11 @@ end
 
 if MG.DisableSpecificEntityDamage or MG.DisableVehicleDamage then
 	hook.Add("EntityTakeDamage", "AntiCrash_DisableEntityKilling", function(target, dmg)
-		if dmg:GetDamageType() == DMG_CRUSH then
-			local ent = dmg:GetInflictor()
-			if !IsValid(ent) then return end
-			if (MG.DisableVehicleDamage and ent:IsVehicle()) or (MG.DisableSpecificEntityDamage and table.HasValue(MG.EntityDamageBlockList, ent:GetClass())) then
-				dmg:SetDamage(0)
-				dmg:ScaleDamage(0)
-				return true
-			end
+		local ent = dmg:GetInflictor()
+		if !IsValid(ent) then return end
+			dmg:SetDamage(0)
+			dmg:ScaleDamage(0)
+			return true
 		end
 	end)
 end
