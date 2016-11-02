@@ -80,12 +80,12 @@ if MG.EnableAntiPropminge then
 		local mins, maxs, check = ent:OBBMins(), ent:OBBMaxs(), false
 		local tr = {start = ent:LocalToWorld(mins), endpos = ent:LocalToWorld(maxs), filter = ent}
 		local trace = util.TraceLine(tr)
-		check = IsValid(trace.Entity) and trace.Entity:IsPlayer() or false
+		check = IsValid(trace.Entity) and trace.Entity:IsPlayer() and trace.Entity:Alive() or false
 		if check then return check end
 		local pos = ent:GetPos()
 		tr = {start = pos, endpos = pos, filter = ent, mins = ent:OBBMins(), maxs = ent:OBBMaxs()}
 		trace = util.TraceHull(tr)
-		check = IsValid(trace.Entity) and trace.Entity:IsPlayer() or false
+		check = IsValid(trace.Entity) and trace.Entity:IsPlayer() and trace.Entity:Alive() or false
 		if check then return check end
 		local cube = ents.FindInBox(ent:LocalToWorld(mins), ent:LocalToWorld(maxs))
 		for _,v in pairs(cube) do
