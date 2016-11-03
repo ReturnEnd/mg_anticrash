@@ -166,11 +166,11 @@ if MG.FreezeSpecificEntities then
 	end)
 end
 
-if MG.DisableSpecificEntityDamage or MG.DisableVehicleDamage then
-	hook.Add("EntityTakeDamage", "AntiCrash_DisableEntityKilling", function(target, dmg)
+if MG.DisableSpecificEntityDamage then
+	hook.Add("EntityTakeDamage", "AntiCrash_DisableEntityDamage", function(target, dmg)
 		local ent = dmg:GetInflictor()
 		if !IsValid(ent) then return end
-		if (MG.DisableVehicleDamage and ent:IsVehicle()) or (MG.DisableSpecificEntityDamage and dmg:GetDamageType() == DMG_CRUSH and table.HasValue(MG.EntityDamageBlockList, ent:GetClass())) then
+		if table.HasValue(MG.EntityDamageBlockList, ent:GetClass()) then
 			dmg:SetDamage(0)
 			dmg:ScaleDamage(0)
 			return true

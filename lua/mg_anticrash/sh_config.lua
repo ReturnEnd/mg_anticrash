@@ -17,7 +17,6 @@ MG.DisableUnfreeze = true -- Disable unfreeze of these entities?
 MG.BlockBigSizeProps_FPP = true -- Automatically block big size props? (FPP required)
 MG.AllowPhysgunReload = false -- Should players be allowed to use the reload function of the Physics Gun?
 MG.DisableSpecificEntityDamage = false -- Should players receive damage from specified entities?
-MG.DisableVehicleDamage = false -- Should players receive damage from vehicles?
 MG.AllowPhysgunOnWorld = false -- Should it be allowed to physgun world entities?
 MG.AllowToolgunOnWorld = false -- Should it be allowed to use the toolgun on world entities?
 MG.AllowPropertyOnWorld = false -- Should it be allowed to use the property system on world entities?
