@@ -166,11 +166,23 @@ if MG.FreezeSpecificEntities then
 	end)
 end
 
-if MG.DisableSpecificEntityDamage then
+if MG.DisableVehicleCollision then
+	hook.Add("OnEntityCreated", "AntiCrash_BlockWorldEntities", function(ent)
+		timer.Simple(0, function()
+			if !IsValid(ent) then return end
+			if ent:IsVehicle() then
+				ent:SetCollisionGroup(COLLISION_GROUP_WEAPON)
+			end
+		end)
+	end)
+end
+
+if MG.DisableSpecificEntityDamage or MG.DisableVehicleDamage then
 	hook.Add("EntityTakeDamage", "AntiCrash_DisableEntityDamage", function(target, dmg)
 		local ent = dmg:GetInflictor()
-		if !IsValid(ent) then return end
-		if table.HasValue(MG.EntityDamageBlockList, ent:GetClass()) then
+		local attacker = dmg:GetAttacker()
+		if !IsValid(ent) or !IsValid(attacker) then return end
+		if (MG.DisableVehicleDamage and ent:IsVehicle() or attacker:IsVehicle()) or (MG.DisableSpecificEntityDamage and table.HasValue(MG.EntityDamageBlockList, ent:GetClass())) then
 			dmg:SetDamage(0)
 			dmg:ScaleDamage(0)
 			return true
