@@ -64,7 +64,7 @@ if MG.EnableAntiPropminge then
 	hook.Add("CanTool", "AntiCrash_WeldWorkaround", function(ply, tr, tool)
 		if IsValid(tr.Entity) and (tool == "weld" or tool == "precision") then
 			local ent = tr.Entity
-			if FPP.canTouchEnt and !FPP.canTouchEnt(trace.Entity, "Toolgun") then return end
+			if FPP and FPP.canTouchEnt and !FPP.canTouchEnt(trace.Entity, "Toolgun") then return end
 			timer.Simple(0, function()
 				if IsValid(ent) then
 					local phys = ent:GetPhysicsObject()
@@ -167,7 +167,7 @@ if MG.FreezeSpecificEntities then
 end
 
 if MG.DisableVehicleCollision then
-	hook.Add("OnEntityCreated", "AntiCrash_BlockWorldEntities", function(ent)
+	hook.Add("OnEntityCreated", "AntiCrash_SetVehicleCollision", function(ent)
 		timer.Simple(0, function()
 			if !IsValid(ent) then return end
 			if ent:IsVehicle() then
