@@ -19,8 +19,9 @@ MG.AllowPhysgunReload = false -- Should players be allowed to use the reload fun
 MG.DisableSpecificEntityDamage = false -- Should players receive damage from specified entities?
 MG.DisableVehicleDamage = false -- Disable vehicle damage?
 MG.DisableVehicleCollision = true -- Disable vehicles colliding with players?
-MG.AllowPhysgunOnWorld = false -- Should it be allowed to physgun world entities?
+MG.AllowPhysgunOnWorld = false -- Should it be allowed to physgun map created entities?
 MG.AllowToolgunOnWorld = false -- Should it be allowed to use the toolgun on world entities?
+MG.UseNWBools = false -- Should NWBools be used for Networking map created entities? (Turn this off, if you encounter some sort of lag.)
 MG.AllowPropertyOnWorld = false -- Should it be allowed to use the property system on world entities?
 
 MG.DarkRPNotifications = false -- Display DarkRP-notifications instead of using the ChatPrint function? (DarkRP required)

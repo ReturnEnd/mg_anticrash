@@ -1,6 +1,6 @@
 -- Dont edit this file without knowing what you are doing!
 
-if !MG.PhysgunWorld or !MG.ToolgunWorld then
+if MG.UseNWBools and (!MG.PhysgunWorld or !MG.ToolgunWorld) then
 	hook.Add("OnEntityCreated", "AntiCrash_BlockWorldEntities", function(ent)
 		timer.Simple(0, function()
 			if !IsValid(ent) then return end
