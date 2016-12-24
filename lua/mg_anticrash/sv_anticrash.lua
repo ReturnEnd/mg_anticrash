@@ -96,24 +96,37 @@ if MG.EnableAntiPropminge then
 		return false
 	end
 
-	hook.Add("PlayerSpawnedProp", "AntiCrash_EnableProtectionMode", function(ply, model, ent)
-		timer.Simple(0, function()
-			if !IsValid(ent) then return end
-			if FPP and FPP.UnGhost then
-				FPP.UnGhost(ply, ent)
+	local function GhostEntity(ent)
+		if FPP and FPP.UnGhost then
+			FPP.UnGhost(ply, ent)
+		end
+		local phys = ent:GetPhysicsObject()
+		if IsValid(phys) then
+			if phys:IsMotionEnabled() or CheckForStuckingPlayers(ent) == true then
+				ent.protected = true
+				EnableProtectionMode(ent)
 			end
-			local phys = ent:GetPhysicsObject()
-			if IsValid(phys) then
-				if phys:IsMotionEnabled() or CheckForStuckingPlayers(ent) == true then
-					ent.protected = true
-					EnableProtectionMode(ent)
-				end
-			end
+		end
+	end
+
+	if !MG.GhostAllEntities then
+		hook.Add("PlayerSpawnedProp", "AntiCrash_EnableProtectionMode", function(_, _, ent)
+			timer.Simple(0, function()
+				if !IsValid(ent) then return end
+				GhostEntity(ent)
+			end)
 		end)
-	end)
+	else
+		hook.Add("OnEntityCreated", "AntiCrash_EnableProtectionMode", function(ent)
+			timer.Simple(0, function()
+				if !IsValid(ent) then return end
+				GhostEntity(ent)
+			end)
+		end)
+	end
 
 	hook.Add("PhysgunPickup", "AntiCrash_EnableProtectionMode", function(ply, ent)
-		if ent:GetClass() != "prop_physics" or ent.protected then return end
+		if !table.HasValue(MG.MingeEntities, ent:GetClass()) or ent.protected then return end
 		if ent.CPPICanPhysgun and !ent:CPPICanPhysgun(ply) then return end
 		if !MG.PhysgunWorld and ent:CreatedByMap() then return end
 		ent.protected = true
@@ -121,7 +134,7 @@ if MG.EnableAntiPropminge then
 	end)
 
 	hook.Add("OnPhysgunFreeze", "AntiCrash_DisableProtectionMode", function(weapon, physobj, ent, ply)
-		if ent:GetClass() != "prop_physics" or !ent.protected then return end
+		if !table.HasValue(MG.MingeEntities, ent:GetClass()) or !ent.protected then return end
 		if CheckForStuckingPlayers(ent) == true then
 			local message = MG.LanguageStrings[2]
 			if MG.DarkRPNotifications then
@@ -136,7 +149,7 @@ if MG.EnableAntiPropminge then
 	end)
 
 	hook.Add("PlayerUnfrozeObject", "AntiCrash_DisableProtectionMode", function(ply, ent)
-		if ent:GetClass() != "prop_physics" or ent.protected then return end
+		if !table.HasValue(MG.MingeEntities, ent:GetClass()) or ent.protected then return end
 		ent.protected = true
 		EnableProtectionMode(ent)
 	end)

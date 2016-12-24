@@ -7,6 +7,7 @@ MG.FreezeAllPropsOnServerLag = true -- Freeze props on heavily server lag?
 MG.MaxLongs = 3 -- Adjust.
 MG.Sensitivity = 15 -- Adjust.
 MG.EnableAntiPropminge = true -- Disable minging around with props? (Disables collision, when props are unfrozen)
+MG.GhostAllEntities = false -- Should we ghost all entities specified in the MingeEntities-table?
 MG.EnablePropCollide = false -- Enable collision between two props.
 MG.BlockToolsOnGhostEntities = true -- Block tool usage on ghosted entities?
 MG.FreezeSpecificEntities = true -- Freeze specified entities in a delay?
@@ -25,6 +26,11 @@ MG.UseNWBools = false -- Should NWBools be used for Networking map created entit
 MG.AllowPropertyOnWorld = false -- Should it be allowed to use the property system on world entities?
 
 MG.DarkRPNotifications = false -- Display DarkRP-notifications instead of using the ChatPrint function? (DarkRP required)
+
+MG.MingeEntities = { -- Which entities should be ghosted on pickup (eventually spawn) and unghosted on drop?
+	"prop_physics", -- Don't remove this, if MG.GhostAllEntities is set to false.
+	"prop_physics_multiplayer"
+}
 
 MG.AllowedTools = { -- Which tools should be allowed to be used on ghosted entities?
 	"remover"
