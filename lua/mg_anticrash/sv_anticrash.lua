@@ -109,9 +109,18 @@ if MG.EnableAntiPropminge then
 		end
 	end
 
+	local function CheckForClass(ent)
+		if !MG.UseWhitelist and !table.HasValue(MG.MingeEntities, ent:GetClass()) then
+			return false
+		elseif MG.UseWhitelist and table.HasValue(MG.MingeEntities, ent:GetClass()) then
+			return false
+		end
+		return true
+	end
+
 	if !MG.GhostAllEntities then
 		hook.Add("PlayerSpawnedProp", "AntiCrash_EnableProtectionMode", function(_, _, ent)
-			if !table.HasValue(MG.MingeEntities, ent:GetClass()) then return end
+			if (CheckForClass(ent) == false) then return end
 			timer.Simple(0, function()
 				if !IsValid(ent) then return end
 				GhostEntity(ent)
@@ -119,7 +128,7 @@ if MG.EnableAntiPropminge then
 		end)
 	else
 		hook.Add("OnEntityCreated", "AntiCrash_EnableProtectionMode", function(ent)
-			if !table.HasValue(MG.MingeEntities, ent:GetClass()) then return end
+			if (CheckForClass(ent) == false) then return end
 			timer.Simple(0, function()
 				if !IsValid(ent) then return end
 				GhostEntity(ent)
@@ -128,7 +137,7 @@ if MG.EnableAntiPropminge then
 	end
 
 	hook.Add("PhysgunPickup", "AntiCrash_EnableProtectionMode", function(ply, ent)
-		if !table.HasValue(MG.MingeEntities, ent:GetClass()) or ent.protected then return end
+		if (CheckForClass(ent) == false) or ent.protected then return end
 		if ent.CPPICanPhysgun and !ent:CPPICanPhysgun(ply) then return end
 		if !MG.PhysgunWorld and ent:CreatedByMap() then return end
 		ent.protected = true
@@ -136,7 +145,7 @@ if MG.EnableAntiPropminge then
 	end)
 
 	hook.Add("OnPhysgunFreeze", "AntiCrash_DisableProtectionMode", function(weapon, physobj, ent, ply)
-		if !table.HasValue(MG.MingeEntities, ent:GetClass()) or !ent.protected then return end
+		if (CheckForClass(ent) == false) or !ent.protected then return end
 		if CheckForStuckingPlayers(ent) == true then
 			local message = MG.LanguageStrings[2]
 			if MG.DarkRPNotifications then
@@ -151,7 +160,7 @@ if MG.EnableAntiPropminge then
 	end)
 
 	hook.Add("PlayerUnfrozeObject", "AntiCrash_DisableProtectionMode", function(ply, ent)
-		if !table.HasValue(MG.MingeEntities, ent:GetClass()) or ent.protected then return end
+		if (CheckForClass(ent) == false) or ent.protected then return end
 		ent.protected = true
 		EnableProtectionMode(ent)
 	end)
