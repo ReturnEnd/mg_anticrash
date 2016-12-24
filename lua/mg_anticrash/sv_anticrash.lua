@@ -111,6 +111,7 @@ if MG.EnableAntiPropminge then
 
 	if !MG.GhostAllEntities then
 		hook.Add("PlayerSpawnedProp", "AntiCrash_EnableProtectionMode", function(_, _, ent)
+			if !table.HasValue(MG.MingeEntities, ent:GetClass()) then return end
 			timer.Simple(0, function()
 				if !IsValid(ent) then return end
 				GhostEntity(ent)
@@ -118,6 +119,7 @@ if MG.EnableAntiPropminge then
 		end)
 	else
 		hook.Add("OnEntityCreated", "AntiCrash_EnableProtectionMode", function(ent)
+			if !table.HasValue(MG.MingeEntities, ent:GetClass()) then return end
 			timer.Simple(0, function()
 				if !IsValid(ent) then return end
 				GhostEntity(ent)
