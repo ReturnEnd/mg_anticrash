@@ -7,7 +7,7 @@ hook.Add("PhysgunPickup", "AntiCrash_BlockPhysgun", function(ply, ent)
 end)
 
 hook.Add("CanTool", "AntiCrash_BlockToolgun", function(ply, tr, tool)
-	if IsValid(tr.Entity) and (tr.Entity:GetNWBool("MG_T_Blocked") or ((MG.UseNWBools and tr.Entity:GetNWBool("MG_T_Blocked_S") and !table.HasValue(MG.AllowedTools, tool)) or SERVER and tr.Entity:CreatedByMap())) then
+	if IsValid(tr.Entity) and (!table.HasValue(MG.AllowedTools, tool) and tr.Entity:GetNWBool("MG_T_Blocked") or ((MG.UseNWBools and tr.Entity:GetNWBool("MG_T_Blocked_S")) or SERVER and tr.Entity:CreatedByMap())) then
 		return false
 	end
 end)
