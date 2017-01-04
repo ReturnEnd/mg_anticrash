@@ -12,4 +12,4 @@ hook.Add("CanTool", "AntiCrash_BlockToolgun", function(ply, tr, tool)
 	end
 end)
 
-print("MG: AntiCrash shared initialised")
+print("MG: AntiCrash shared initialised") 
