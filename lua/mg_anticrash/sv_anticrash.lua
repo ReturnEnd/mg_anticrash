@@ -77,22 +77,16 @@ if MG.EnableAntiPropminge then
 	end)
 
 	local function CheckForStuckingPlayers(ent)
-		local mins, maxs, check = ent:OBBMins(), ent:OBBMaxs(), false
+		local mins, maxs, check = ent:OBBMins(), ent:OBBMaxs()
 		local tr = {start = ent:LocalToWorld(mins), endpos = ent:LocalToWorld(maxs), filter = ent}
 		local trace = util.TraceLine(tr)
-		check = IsValid(trace.Entity) and trace.Entity:IsPlayer() and trace.Entity:Alive() or false
+		check = IsValid(trace.Entity) and trace.Entity:IsPlayer() and trace.Entity:IsVehicle() and trace.Entity:Alive() or false
 		if check then return check end
 		local pos = ent:GetPos()
 		tr = {start = pos, endpos = pos, filter = ent, mins = ent:OBBMins(), maxs = ent:OBBMaxs()}
 		trace = util.TraceHull(tr)
-		check = IsValid(trace.Entity) and trace.Entity:IsPlayer() and trace.Entity:Alive() or false
+		check = IsValid(trace.Entity) and trace.Entity:IsPlayer() and trace.Entity:IsVehicle() trace.Entity:Alive() or false
 		if check then return check end
-		local cube = ents.FindInBox(ent:LocalToWorld(mins), ent:LocalToWorld(maxs))
-		for _,v in pairs(cube) do
-			if v:IsPlayer() and v:Alive() then
-				return true
-			end
-		end
 		return false
 	end
 
