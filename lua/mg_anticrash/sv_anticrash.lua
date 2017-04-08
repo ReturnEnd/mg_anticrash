@@ -66,13 +66,18 @@ if MG.EnableAntiPropminge then
 			local ent = tr.Entity
 			if FPP and FPP.canTouchEnt and !FPP.canTouchEnt(trace.Entity, "Toolgun") then return end
 			timer.Simple(0, function()
-				if IsValid(ent) then
-					local phys = ent:GetPhysicsObject()
-					if IsValid(phys) and phys:IsMotionEnabled() then
-						phys:EnableMotion(false)
-					end
+				if !IsValid(ent) then return end
+				local phys = ent:GetPhysicsObject()
+				if IsValid(phys) and phys:IsMotionEnabled() then
+					phys:EnableMotion(false)
 				end
 			end)
+		end
+	end)
+
+	hook.Add("CanProperty", "AntiCrash_CollideWorkaround", function(ply, prop, ent)
+		if ent.MG_Protected and prop == "collisions" then
+			return false
 		end
 	end)
 
@@ -97,7 +102,7 @@ if MG.EnableAntiPropminge then
 		local phys = ent:GetPhysicsObject()
 		if IsValid(phys) then
 			if phys:IsMotionEnabled() or CheckForStuckingPlayers(ent) == true then
-				ent.protected = true
+				ent.MG_Protected = true
 				EnableProtectionMode(ent)
 			end
 		end
@@ -131,15 +136,15 @@ if MG.EnableAntiPropminge then
 	end
 
 	hook.Add("PhysgunPickup", "AntiCrash_EnableProtectionMode", function(ply, ent)
-		if (CheckForClass(ent) == false) or ent.protected then return end
+		if (CheckForClass(ent) == false) or ent.MG_Protected then return end
 		if ent.CPPICanPhysgun and !ent:CPPICanPhysgun(ply) then return end
 		if !MG.PhysgunWorld and ent:CreatedByMap() then return end
-		ent.protected = true
+		ent.MG_Protected = true
 		EnableProtectionMode(ent)
 	end)
 
 	hook.Add("OnPhysgunFreeze", "AntiCrash_DisableProtectionMode", function(weapon, physobj, ent, ply)
-		if (CheckForClass(ent) == false) or !ent.protected then return end
+		if (CheckForClass(ent) == false) or !ent.MG_Protected then return end
 		if CheckForStuckingPlayers(ent) == true then
 			local message = MG.LanguageStrings[2]
 			if MG.DarkRPNotifications then
@@ -149,13 +154,13 @@ if MG.EnableAntiPropminge then
 			end
 			return false
 		end
-		ent.protected = nil
+		ent.MG_Protected = nil
 		DisableProtectionMode(ent)
 	end)
 
 	hook.Add("PlayerUnfrozeObject", "AntiCrash_DisableProtectionMode", function(ply, ent)
-		if (CheckForClass(ent) == false) or ent.protected then return end
-		ent.protected = true
+		if (CheckForClass(ent) == false) or ent.MG_Protected then return end
+		ent.MG_Protected = true
 		EnableProtectionMode(ent)
 	end)
 end
@@ -271,8 +276,8 @@ local function AntiCrash_FreezeSpecificEntities(force)
 	for _,s in pairs(MG.EntityFreezeList) do
 		for _,v in pairs(ents.FindByClass(s)) do
 			if !force and v.picked then continue end
-			if MG.EnableAntiPropminge and v.protected then
-				v.protected = nil
+			if MG.EnableAntiPropminge and v.MG_Protected then
+				v.MG_Protected = nil
 				DisableProtectionMode(v)
 			end
 			local phys = v:GetPhysicsObject()
