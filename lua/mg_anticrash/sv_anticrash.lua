@@ -30,7 +30,8 @@ if !MG.AllowPhysgunReload then
 	end)
 end
 
-local function EnableProtectionMode(ent)
+function MG.EnableProtectionMode(ent)
+	if hook.Call("AntiCrash_ShouldEnableProtectionMode", nil, ent) == false then return end
 	if MG.BlockToolsOnGhostEntities then
 		ent:SetNWBool("MG_T_Blocked", true)
 	end
@@ -49,7 +50,8 @@ local function EnableProtectionMode(ent)
 	ent:CollisionRulesChanged()
 end
 
-local function DisableProtectionMode(ent)
+function MG.DisableProtectionMode(ent)
+	if hook.Call("AntiCrash_ShouldDisableProtectionMode", nil, ent) == false then return end
 	if MG.BlockToolsOnGhostEntities then
 		ent:SetNWBool("MG_T_Blocked", false)
 	end
@@ -61,57 +63,62 @@ local function DisableProtectionMode(ent)
 end
 
 if MG.EnableAntiPropminge then
-	hook.Add("CanTool", "AntiCrash_WeldWorkaround", function(ply, tr, tool)
-		if IsValid(tr.Entity) and (tool == "weld" or tool == "precision") then
-			local ent = tr.Entity
-			if FPP and FPP.canTouchEnt and !FPP.canTouchEnt(trace.Entity, "Toolgun") then return end
-			timer.Simple(0, function()
-				if !IsValid(ent) then return end
-				local phys = ent:GetPhysicsObject()
-				if IsValid(phys) and phys:IsMotionEnabled() then
-					phys:EnableMotion(false)
-				end
-			end)
-		end
-	end)
+	if MG.AllowWeldWorkaround then
+		hook.Add("CanTool", "AntiCrash_WeldWorkaround", function(ply, tr, tool)
+			if IsValid(tr.Entity) and (tool == "weld" or tool == "precision") then
+				local ent = tr.Entity
+				if FPP and FPP.canTouchEnt and !FPP.canTouchEnt(trace.Entity, "Toolgun") then return end
+				timer.Simple(0, function()
+					if !IsValid(ent) then return end
+					local phys = ent:GetPhysicsObject()
+					if IsValid(phys) and phys:IsMotionEnabled() then
+						phys:EnableMotion(false)
+					end
+				end)
+			end
+		end)
+	end
 
-	hook.Add("CanProperty", "AntiCrash_CollideWorkaround", function(ply, prop, ent)
-		if ent.MG_Protected and prop == "collisions" then
-			return false
-		end
-	end)
+	if MG.AllowCollideWorkaround then
+		hook.Add("CanProperty", "AntiCrash_CollideWorkaround", function(ply, prop, ent)
+			if ent.MG_Protected and prop == "collisions" then
+				return false
+			end
+		end)
+	end
 
-	local function CheckForStuckingPlayers(ent)
+	function MG.CheckForStuckingPlayers(ent)
+		if hook.Call("AntiCrash_ShouldCheckForStuckingPlayers", nil, ent) == false then return false end
 		local mins, maxs, check = ent:OBBMins(), ent:OBBMaxs()
 		local tr = {start = ent:LocalToWorld(mins), endpos = ent:LocalToWorld(maxs), filter = ent}
-		local trace = util.TraceLine(tr)
-		check = IsValid(trace.Entity) and (trace.Entity:IsPlayer() and trace.Entity:Alive() or trace.Entity:IsVehicle()) or false
+		local trace1 = util.TraceLine(tr)
+		check = IsValid(trace1.Entity) and (trace1.Entity:IsPlayer() and trace1.Entity:Alive() or trace1.Entity:IsVehicle()) or false
 		if check then return check end
-		local pos = ent:GetPos()
-		tr = {start = pos, endpos = pos, filter = ent, mins = ent:OBBMins(), maxs = ent:OBBMaxs()}
-		trace = util.TraceHull(tr)
-		check = IsValid(trace.Entity) and (trace.Entity:IsPlayer() and trace.Entity:Alive() or trace.Entity:IsVehicle()) or false
+		tr = {start = ent:GetPos(), endpos = ent:GetPos(), filter = ent, mins = ent:OBBMins(), maxs = ent:OBBMaxs()}
+		trace2 = util.TraceHull(tr)
+		check = IsValid(trace2.Entity) and (trace2.Entity:IsPlayer() and trace2.Entity:Alive() or trace2.Entity:IsVehicle()) or false
 		if check then return check end
 		return false
 	end
 
-	local function GhostEntity(ent)
+	function MG.GhostEntity(ent)
+		if hook.Call("AntiCrash_ShouldGhostEntity", nil, ent) == false then return end
 		if FPP and FPP.UnGhost then
 			FPP.UnGhost(ply, ent)
 		end
 		local phys = ent:GetPhysicsObject()
 		if IsValid(phys) then
-			if phys:IsMotionEnabled() or CheckForStuckingPlayers(ent) == true then
+			if phys:IsMotionEnabled() or MG.CheckForStuckingPlayers(ent) == true then
 				ent.MG_Protected = true
-				EnableProtectionMode(ent)
+				MG.EnableProtectionMode(ent)
 			end
 		end
 	end
 
-	local function CheckForClass(ent)
-		if !MG.UseWhitelist and !table.HasValue(MG.MingeEntities, ent:GetClass()) then
+	function MG.CheckForClass(ent)
+		if (!MG.UseWhitelist and !MG.MingeEntities[string.lower(ent:GetClass())] == true) then
 			return false
-		elseif MG.UseWhitelist and table.HasValue(MG.MingeEntities, ent:GetClass()) then
+		elseif (MG.UseWhitelist and MG.MingeEntities[string.lower(ent:GetClass())] == true) then
 			return false
 		end
 		return true
@@ -119,33 +126,33 @@ if MG.EnableAntiPropminge then
 
 	if !MG.GhostAllEntities then
 		hook.Add("PlayerSpawnedProp", "AntiCrash_EnableProtectionMode", function(_, _, ent)
-			if (CheckForClass(ent) == false) then return end
+			if (MG.CheckForClass(ent) == false) then return end
 			timer.Simple(0, function()
 				if !IsValid(ent) then return end
-				GhostEntity(ent)
+				MG.GhostEntity(ent)
 			end)
 		end)
 	else
 		hook.Add("OnEntityCreated", "AntiCrash_EnableProtectionMode", function(ent)
-			if (CheckForClass(ent) == false) then return end
+			if (MG.CheckForClass(ent) == false) then return end
 			timer.Simple(0, function()
 				if !IsValid(ent) then return end
-				GhostEntity(ent)
+				MG.GhostEntity(ent)
 			end)
 		end)
 	end
 
 	hook.Add("PhysgunPickup", "AntiCrash_EnableProtectionMode", function(ply, ent)
-		if (CheckForClass(ent) == false) or ent.MG_Protected then return end
+		if (MG.CheckForClass(ent) == false) or ent.MG_Protected then return end
 		if ent.CPPICanPhysgun and !ent:CPPICanPhysgun(ply) then return end
 		if !MG.PhysgunWorld and ent:CreatedByMap() then return end
 		ent.MG_Protected = true
-		EnableProtectionMode(ent)
+		MG.EnableProtectionMode(ent)
 	end)
 
-	hook.Add("OnPhysgunFreeze", "AntiCrash_DisableProtectionMode", function(weapon, physobj, ent, ply)
-		if (CheckForClass(ent) == false) or !ent.MG_Protected then return end
-		if CheckForStuckingPlayers(ent) == true then
+	hook.Add("OnPhysgunFreeze", "AntiCrash_DisableProtectionMode", function(weapon, phys, ent, ply)
+		if (MG.CheckForClass(ent) == false) or !ent.MG_Protected then return end
+		if MG.CheckForStuckingPlayers(ent) == true then
 			local message = MG.LanguageStrings[2]
 			if MG.DarkRPNotifications then
 				DarkRP.notify(ply, 1, 5, message)
@@ -155,13 +162,13 @@ if MG.EnableAntiPropminge then
 			return false
 		end
 		ent.MG_Protected = nil
-		DisableProtectionMode(ent)
+		MG.DisableProtectionMode(ent)
 	end)
 
 	hook.Add("PlayerUnfrozeObject", "AntiCrash_DisableProtectionMode", function(ply, ent)
-		if (CheckForClass(ent) == false) or ent.MG_Protected then return end
+		if (MG.CheckForClass(ent) == false) or ent.MG_Protected then return end
 		ent.MG_Protected = true
-		EnableProtectionMode(ent)
+		MG.EnableProtectionMode(ent)
 	end)
 end
 
@@ -169,28 +176,29 @@ if MG.FreezeSpecificEntities then
 	hook.Add("PhysgunPickup", "AntiCrash_PickUpCheck", function(ply, ent)
 		if ent.CPPICanPhysgun and !ent:CPPICanPhysgun(ply) then return end
 		if !MG.PhysgunWorld and ent:CreatedByMap() then return end
-		ent.picked = true
+		ent.MG_PickedUp = true
 	end)
 
 	hook.Add("PhysgunDrop", "AntiCrash_PickUpCheck", function(ply, ent)
-		ent.picked = nil
+		ent.MG_PickedUp = nil
 	end)
 
-	hook.Add("OnPhysgunFreeze", "AntiCrash_PickUpCheck", function(weapon, physobj, ent)
-		ent.picked = nil
+	hook.Add("OnPhysgunFreeze", "AntiCrash_PickUpCheck", function(weapon, phys, ent)
+		ent.MG_PickedUp = nil
 	end)
 
 	hook.Add("GravGunOnPickedUp", "AntiCrash_PickUpCheck", function(ply, ent)
-		ent.picked = true
+		ent.MG_PickedUp = true
 	end)
 
 	hook.Add("GravGunOnDropped", "AntiCrash_PickUpCheck", function(ply, ent)
-		ent.picked = nil
+		ent.MG_PickedUp = nil
 	end)
 end
 
 if MG.DisableVehicleCollision then
 	hook.Add("OnEntityCreated", "AntiCrash_SetVehicleCollision", function(ent)
+		if hook.Call("AntiCrash_ShouldEnableVehicleCollision", nil, ent) == false then return end
 		timer.Simple(0, function()
 			if !IsValid(ent) then return end
 			if ent:IsVehicle() then
@@ -205,7 +213,8 @@ if MG.DisableSpecificEntityDamage or MG.DisableVehicleDamage then
 		local ent = dmg:GetInflictor()
 		local attacker = dmg:GetAttacker()
 		if !IsValid(ent) or !IsValid(attacker) then return end
-		if (MG.DisableVehicleDamage and ent:IsVehicle() or attacker:IsVehicle()) or (MG.DisableSpecificEntityDamage and table.HasValue(MG.EntityDamageBlockList, ent:GetClass())) then
+		if hook.Call("AntiCrash_ShouldApplyVehicleDamage", nil, target, dmg, ent, attacker) == false then return end
+		if (MG.DisableVehicleDamage and ent:IsVehicle() or attacker:IsVehicle()) or (MG.DisableSpecificEntityDamage and MG.EntityDamageBlockList[string.lower(ent:GetClass())] == true) then
 			dmg:SetDamage(0)
 			dmg:ScaleDamage(0)
 			return true
@@ -214,10 +223,9 @@ if MG.DisableSpecificEntityDamage or MG.DisableVehicleDamage then
 end
 
 if MG.BlockBigSizeProps_FPP then
-	local function AntiCrash_FixModel(model)
+	function MG.AntiCrash_FixModel(model)
 		local model = model or ""
-		model = tostring(model)
-		model = string.lower(model)
+		model = tostring(string.lower(model))
 		model = string.Replace(model, "\\", "/")
 		model = string.Replace(model, " ", "_")
 		model = string.Replace(model, ";", "")
@@ -229,7 +237,8 @@ if MG.BlockBigSizeProps_FPP then
 		local phys = ent:GetPhysicsObject()
 		if IsValid(phys) and phys:GetVolume() then
 			if phys:GetVolume() > math.pow(10, 7) then
-				mdl = AntiCrash_FixModel(mdl)
+				if hook.Call("AntiCrash_ShouldAddToBlacklist", nil, ply, mdl, ent) == false then return end
+				mdl = MG.AntiCrash_FixModel(mdl)
 				if mdl and type(FPP) == "table" then
 					RunConsoleCommand("FPP_AddBlockedModel", mdl)
 				end
@@ -249,7 +258,8 @@ end
 
 if MG.FreezeSpecificEntitiesAfterSpawn then
 	hook.Add("OnEntityCreated", "AntiCrash_FreezeSpecificEntities", function(ent)
-		if !table.HasValue(MG.EntitySpawnFreezeList, ent:GetClass()) then return end
+		if hook.Call("AntiCrash_ShouldEntityFreeze", nil, ent) == false then return end
+		if (!MG.EntitySpawnFreezeList[string.lower(ent:GetClass())] == true) then return end
 		timer.Simple(0, function()
 			if !IsValid(ent) then return end
 			local phys = ent:GetPhysicsObject()
@@ -272,32 +282,40 @@ if MG.FreezeSpecificEntitiesAfterSpawn then
 	end
 end
 
-local function AntiCrash_FreezeSpecificEntities(force)
-	for _,s in pairs(MG.EntityFreezeList) do
-		for _,v in pairs(ents.FindByClass(s)) do
-			if !force and v.picked then continue end
-			if MG.EnableAntiPropminge and v.MG_Protected then
-				v.MG_Protected = nil
-				DisableProtectionMode(v)
-			end
-			local phys = v:GetPhysicsObject()
-			if IsValid(phys) then
-				phys:EnableMotion(false)
-			end
+function MG.FreezeEntities(force)
+	for _,v in pairs(ents.GetAll()) do
+		if !MG.EntityFreezeList[string.lower(v:GetClass())] then continue end
+		if !force and v.MG_PickedUp then continue end
+		if MG.EnableAntiPropminge and v.MG_Protected then
+			v.MG_Protected = nil
+			MG.DisableProtectionMode(v)
+		end
+		local phys = v:GetPhysicsObject()
+		if IsValid(phys) then
+			phys:EnableMotion(false)
 		end
 	end
+	hook.Call("AntiCrash_FreezeAllMapEntities", nil)
+end
+
+if MG.EnableFreezeCommand then
+	concommand.Add("ac_freeze", function(ply, cmd, args)
+		if ply:IsAdmin() then
+			MG.FreezeEntities(true)
+		end
+	end)
 end
 
 if MG.FreezeAllMapEntities then
 	timer.Create("AntiCrash_FreezeAllMapEntities", 1, 1, function()
-		AntiCrash_FreezeSpecificEntities(false)
+		MG.FreezeEntities(false)
 		MsgN("[MG] Froze all map props.")
 	end)
 end
 
 if MG.FreezeSpecificEntities then
 	timer.Create("AntiCrash_FreezeProps", MG.FreezeSpecificEntitiesTimer, 0, function()
-		AntiCrash_FreezeSpecificEntities(false)
+		MG.FreezeEntities(false)
 		MsgN("[MG] Froze specific entities.")
 	end)
 end
@@ -313,7 +331,7 @@ if MG.FreezeAllPropsOnServerLag then
 			if rate < tickrate / MG.Sensitivity then
 				counter = counter + 1
 				if counter >= MG.MaxLongs then
-					AntiCrash_FreezeSpecificEntities(true)
+					MG.FreezeEntities(true)
 					MsgN("[MG] Froze all props due to server lag.")
 					counter = 0
 				end
