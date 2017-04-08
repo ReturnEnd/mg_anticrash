@@ -81,7 +81,7 @@ if MG.EnableAntiPropminge then
 
 	if MG.AllowCollideWorkaround then
 		hook.Add("CanProperty", "AntiCrash_CollideWorkaround", function(ply, prop, ent)
-			if ent.MG_Protected and prop == "collisions" then
+			if ent.MG_Protected and prop == "collision" then
 				return false
 			end
 		end)
