@@ -32,33 +32,33 @@ MG.AllowPropertyOnWorld = false -- Should it be allowed to use the property syst
 MG.DarkRPNotifications = false -- Display DarkRP-notifications instead of using the ChatPrint function? (DarkRP required)
 
 MG.MingeEntities = { -- Which entities should be ghosted on pickup (eventually spawn) and unghosted on drop?
-	"prop_physics" = true, -- Don't remove this, if MG.GhostAllEntities is set to false.
-	"prop_physics_multiplayer" = true -- Don't remove this, if MG.GhostAllEntities is set to false.
+	["prop_physics"] = true, -- Don't remove this, if MG.GhostAllEntities is set to false.
+	["prop_physics_multiplayer"] = true -- Don't remove this, if MG.GhostAllEntities is set to false.
 }
 
 MG.AllowedTools = { -- Which tools should be allowed to be used on ghosted entities?
-	"remover" = true
+	["remover"] = true
 }
 
 MG.EntityFreezeList = { -- Which entities should freeze periodically?
-	"prop_physics" = true,
-	"prop_physics_multiplayer" = true
+	["prop_physics"] = true,
+	["prop_physics_multiplayer"] = true
 }
 
 MG.EntitySpawnFreezeList = { -- Which entities should be completly frozen on spawn?
-	"gmod_button" = true
+	["gmod_button"] = true
 }
 
 MG.EntityDamageBlockList = { -- Which entities should not deal damage to players?
-	"prop_physics" = true,
-	"prop_physics_multiplayer" = true,
-	"gmod_balloon" = true,
-	"gmod_button" = true,
-	"gmod_thruster" = true,
-	"gmod_light" = true,
-	"gmod_lamp" = true,
-	"gmod_wheel" = true,
-	"gmod_hoverball" = true
+	["prop_physics"] = true,
+	["prop_physics_multiplayer"] = true,
+	["gmod_balloon"] = true,
+	["gmod_button"] = true,
+	["gmod_thruster"] = true,
+	["gmod_light"] = true,
+	["gmod_lamp"] = true,
+	["gmod_wheel"] = true,
+	["gmod_hoverball"] = true
 }
 
 MG.LanguageStrings = { -- Translate the addon
