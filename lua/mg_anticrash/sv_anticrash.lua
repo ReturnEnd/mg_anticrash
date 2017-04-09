@@ -284,7 +284,7 @@ end
 
 function MG.FreezeEntities(force)
 	for _,v in pairs(ents.GetAll()) do
-		if !MG.EntityFreezeList[string.lower(v:GetClass())] then continue end
+		if !MG.EntityFreezeList[string.lower(v:GetClass())] == true then continue end
 		if !force and v.MG_PickedUp then continue end
 		if MG.EnableAntiPropminge and v.MG_Protected then
 			v.MG_Protected = nil

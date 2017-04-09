@@ -9,7 +9,7 @@ end)
 
 hook.Add("CanTool", "AntiCrash_BlockToolgun", function(ply, tr, tool)
 	if hook.Call("AntiCrash_CanToolgunEntity", nil, ply, tr, tool) == false then return end
-	if IsValid(tr.Entity) and (!MG.AllowedTools[tool] and tr.Entity:GetNWBool("MG_T_Blocked") or ((MG.UseNWBools and tr.Entity:GetNWBool("MG_T_Blocked_S")) or SERVER and tr.Entity:CreatedByMap())) then
+	if IsValid(tr.Entity) and (!MG.AllowedTools[tool] == true and tr.Entity:GetNWBool("MG_T_Blocked") or ((MG.UseNWBools and tr.Entity:GetNWBool("MG_T_Blocked_S")) or SERVER and tr.Entity:CreatedByMap())) then
 		return false
 	end
 end)
