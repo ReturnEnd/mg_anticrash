@@ -92,11 +92,11 @@ if MG.EnableAntiPropminge then
 		local mins, maxs, check = ent:OBBMins(), ent:OBBMaxs()
 		local tr = {start = ent:LocalToWorld(mins), endpos = ent:LocalToWorld(maxs), filter = ent}
 		local trace1 = util.TraceLine(tr)
-		check = IsValid(trace1.Entity) and (trace1.Entity:IsPlayer() and trace1.Entity:Alive() or trace1.Entity:IsVehicle()) or false
+		check = IsValid(trace1.Entity) and (trace1.Entity:IsPlayer() and trace1.Entity:Alive() or (MG.DisableFreezeInVehicles and trace1.Entity:IsVehicle())) or false
 		if check then return check end
 		tr = {start = ent:GetPos(), endpos = ent:GetPos(), filter = ent, mins = ent:OBBMins(), maxs = ent:OBBMaxs()}
 		trace2 = util.TraceHull(tr)
-		check = IsValid(trace2.Entity) and (trace2.Entity:IsPlayer() and trace2.Entity:Alive() or trace2.Entity:IsVehicle()) or false
+		check = IsValid(trace2.Entity) and (trace2.Entity:IsPlayer() and trace2.Entity:Alive() or (MG.DisableFreezeInVehicles and trace2.Entity:IsVehicle())) or false
 		if check then return check end
 		return false
 	end

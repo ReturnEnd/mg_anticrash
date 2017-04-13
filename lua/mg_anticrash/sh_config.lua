@@ -13,6 +13,7 @@ MG.EnablePropCollide = false -- Enable collision between two props.
 MG.BlockToolsOnGhostEntities = true -- Block tool usage on ghosted entities?
 MG.AllowWeldWorkaround = true -- Fix problems with the weld-tool?
 MG.AllowCollideWorkaround = true -- Fix problems with nocollide-properties?
+MG.DisableFreezeInVehicles = false -- Disable the freezing of entities inside of vehicles?
 MG.FreezeSpecificEntities = true -- Freeze specified entities in a delay?
 MG.FreezeSpecificEntitiesTimer = 600 -- In which delay the entities should be frozen?
 MG.FreezeAllMapEntities = true -- Freeze all map props on startup of the map?
