@@ -176,23 +176,32 @@ if MG.FreezeSpecificEntities then
 	hook.Add("PhysgunPickup", "AntiCrash_PickUpCheck", function(ply, ent)
 		if ent.CPPICanPhysgun and !ent:CPPICanPhysgun(ply) then return end
 		if !MG.PhysgunWorld and ent:CreatedByMap() then return end
-		ent.MG_PickedUp = true
+		ent.MG_PickedUp = (ent.MG_PickedUp and ent.MG_PickedUp + 1) or 1
 	end)
 
+	local function ResetPickupStatus(ent)
+		if ent.MG_PickedUp then
+			ent.MG_PickedUp = ent.MG_PickedUp - 1
+			if ent.MG_PickedUp <= 0 then
+				ent.MG_PickedUp = nil
+			end
+		end
+	end
+
 	hook.Add("PhysgunDrop", "AntiCrash_PickUpCheck", function(ply, ent)
-		ent.MG_PickedUp = nil
+		ResetPickupStatus(ent)
 	end)
 
 	hook.Add("OnPhysgunFreeze", "AntiCrash_PickUpCheck", function(weapon, phys, ent)
-		ent.MG_PickedUp = nil
+		ResetPickupStatus(ent)
 	end)
 
 	hook.Add("GravGunOnPickedUp", "AntiCrash_PickUpCheck", function(ply, ent)
-		ent.MG_PickedUp = true
+		ResetPickupStatus(ent)
 	end)
 
 	hook.Add("GravGunOnDropped", "AntiCrash_PickUpCheck", function(ply, ent)
-		ent.MG_PickedUp = nil
+		ResetPickupStatus(ent)
 	end)
 end
 
