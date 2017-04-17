@@ -18,8 +18,6 @@ MG.FreezeSpecificEntities = true -- Freeze specified entities in a delay?
 MG.FreezeSpecificEntitiesTimer = 600 -- In which delay the entities should be frozen?
 MG.FreezeAllMapEntities = true -- Freeze all map props on startup of the map?
 MG.EnableFreezeCommand = true -- Should admins be able to force freeze all props?
-MG.FreezeSpecificEntitiesAfterSpawn = true -- Freeze specified entities after spawning them?
-MG.DisableUnfreeze = true -- Disable unfreeze of these entities?
 MG.BlockBigSizeProps_FPP = true -- Automatically block big size props? (FPP required)
 MG.AllowPhysgunReload = false -- Should players be allowed to use the reload function of the Physics Gun?
 MG.DisableSpecificEntityDamage = false -- Should players receive damage from specified entities?
@@ -44,10 +42,6 @@ MG.AllowedTools = { -- Which tools should be allowed to be used on ghosted entit
 MG.EntityFreezeList = { -- Which entities should freeze periodically?
 	["prop_physics"] = true,
 	["prop_physics_multiplayer"] = true
-}
-
-MG.EntitySpawnFreezeList = { -- Which entities should be completly frozen on spawn?
-	["gmod_button"] = true
 }
 
 MG.EntityDamageBlockList = { -- Which entities should not deal damage to players?

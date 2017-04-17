@@ -2,15 +2,14 @@
 
 if MG.UseNWBools and (!MG.PhysgunWorld or !MG.ToolgunWorld) then
 	hook.Add("OnEntityCreated", "AntiCrash_BlockWorldEntities", function(ent)
+		if !ent:CreatedByMap() then return end
 		timer.Simple(0, function()
 			if !IsValid(ent) then return end
-			if ent:CreatedByMap() then
-				if !MG.PhysgunWorld then
-					ent:SetNWBool("MG_P_Blocked", true)
-				end
-				if !MG.ToolgunWorld then
-					ent:SetNWBool("MG_T_Blocked_S", true)
-				end
+			if !MG.PhysgunWorld then
+				ent:SetNWBool("MG_P_Blocked", true)
+			end
+			if !MG.ToolgunWorld then
+				ent:SetNWBool("MG_T_Blocked_S", true)
 			end
 		end)
 	end)
@@ -89,15 +88,12 @@ if MG.EnableAntiPropminge then
 
 	function MG.CheckForStuckingPlayers(ent)
 		if hook.Run("AntiCrash_ShouldCheckForStuckingPlayers", ent) == false then return false end
-		local mins, maxs, check = ent:OBBMins(), ent:OBBMaxs()
-		local tr = {start = ent:LocalToWorld(mins), endpos = ent:LocalToWorld(maxs), filter = ent}
-		local trace1 = util.TraceLine(tr)
-		check = IsValid(trace1.Entity) and (trace1.Entity:IsPlayer() and trace1.Entity:Alive() or (MG.DisableFreezeInVehicles and trace1.Entity:IsVehicle())) or false
-		if check then return check end
-		tr = {start = ent:GetPos(), endpos = ent:GetPos(), filter = ent, mins = ent:OBBMins(), maxs = ent:OBBMaxs()}
-		trace2 = util.TraceHull(tr)
-		check = IsValid(trace2.Entity) and (trace2.Entity:IsPlayer() and trace2.Entity:Alive() or (MG.DisableFreezeInVehicles and trace2.Entity:IsVehicle())) or false
-		if check then return check end
+		local box = ents.FindInBox(ent:LocalToWorld(ent:OBBMins()), ent:LocalToWorld(ent:OBBMaxs()))
+		for _,v in pairs(box) do
+			if (v:IsPlayer() and v:Alive() or (MG.DisableFreezeInVehicles and v:IsVehicle())) then
+				return true
+			end
+		end
 		return false
 	end
 
@@ -267,6 +263,7 @@ function MG.FreezeEntities(force)
 		if (MG.EntityFreezeList[string.lower(v:GetClass())] != true) then continue end
 		if !force and v.MG_PickedUp then continue end
 		if MG.EnableAntiPropminge and v.MG_Protected then
+			if (!force and MG.CheckForStuckingPlayers(v) == true) then continue end
 			v.MG_Protected = nil
 			MG.DisableProtectionMode(v)
 		end
