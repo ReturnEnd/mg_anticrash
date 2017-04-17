@@ -108,7 +108,7 @@ if MG.EnableAntiPropminge then
 		end
 		local phys = ent:GetPhysicsObject()
 		if IsValid(phys) then
-			if phys:IsMotionEnabled() or MG.CheckForStuckingPlayers(ent) == true then
+			if (phys:IsMotionEnabled() or MG.CheckForStuckingPlayers(ent) == true) then
 				ent.MG_Protected = true
 				MG.EnableProtectionMode(ent)
 			end
@@ -116,31 +116,28 @@ if MG.EnableAntiPropminge then
 	end
 
 	function MG.CheckForClass(ent)
-		if (!MG.UseWhitelist and !MG.MingeEntities[string.lower(ent:GetClass())] == true) then
-			return false
-		elseif (MG.UseWhitelist and MG.MingeEntities[string.lower(ent:GetClass())] == true) then
-			return false
+		if !MG.GhostAllEntities then
+			if (ent:GetClass() == "prop_physics" or ent:GetClass() == "prop_physics_multiplayer") then
+				return true
+			else
+				return false
+			end
 		end
-		return true
+		if (!MG.UseWhitelist and MG.MingeEntities[string.lower(ent:GetClass())] == true) then
+			return true
+		elseif (MG.UseWhitelist and MG.MingeEntities[string.lower(ent:GetClass())] != true) then
+			return true
+		end
+		return false
 	end
 
-	if !MG.GhostAllEntities then
-		hook.Add("PlayerSpawnedProp", "AntiCrash_EnableProtectionMode", function(_, _, ent)
-			if (MG.CheckForClass(ent) == false) then return end
-			timer.Simple(0, function()
-				if !IsValid(ent) then return end
-				MG.GhostEntity(ent)
-			end)
+	hook.Add("OnEntityCreated", "AntiCrash_EnableProtectionMode", function(ent)
+		if (MG.CheckForClass(ent) == false) then return end
+		timer.Simple(0, function()
+			if !IsValid(ent) then return end
+			MG.GhostEntity(ent)
 		end)
-	else
-		hook.Add("OnEntityCreated", "AntiCrash_EnableProtectionMode", function(ent)
-			if (MG.CheckForClass(ent) == false) then return end
-			timer.Simple(0, function()
-				if !IsValid(ent) then return end
-				MG.GhostEntity(ent)
-			end)
-		end)
-	end
+	end)
 
 	hook.Add("PhysgunPickup", "AntiCrash_EnableProtectionMode", function(ply, ent)
 		if (MG.CheckForClass(ent) == false) or ent.MG_Protected then return end
@@ -152,7 +149,7 @@ if MG.EnableAntiPropminge then
 
 	hook.Add("OnPhysgunFreeze", "AntiCrash_DisableProtectionMode", function(weapon, phys, ent, ply)
 		if (MG.CheckForClass(ent) == false) or !ent.MG_Protected then return end
-		if MG.CheckForStuckingPlayers(ent) == true then
+		if (MG.CheckForStuckingPlayers(ent) == true) then
 			local message = MG.LanguageStrings[2]
 			if MG.DarkRPNotifications then
 				DarkRP.notify(ply, 1, 5, message)
@@ -265,35 +262,9 @@ if MG.BlockBigSizeProps_FPP then
 	end)
 end
 
-if MG.FreezeSpecificEntitiesAfterSpawn then
-	hook.Add("OnEntityCreated", "AntiCrash_FreezeSpecificEntities", function(ent)
-		if hook.Run("AntiCrash_ShouldEntityFreeze", ent) == false then return end
-		if (!MG.EntitySpawnFreezeList[string.lower(ent:GetClass())] == true) then return end
-		timer.Simple(0, function()
-			if !IsValid(ent) then return end
-			local phys = ent:GetPhysicsObject()
-			if IsValid(phys) then
-				phys:EnableMotion(false)
-			end
-			if MG.DisableUnfreeze then
-				ent.MG_DisableUnfreeze = true
-				ent:SetNWBool("MG_P_Blocked", true)
-			end
-		end)
-	end)
-	
-	if MG.DisableUnfreeze then
-		hook.Add("CanPlayerUnfreeze", "AntiCrash_DisableUnfreeze", function(ply, ent)
-			if ent.MG_DisableUnfreeze then
-				return false
-			end
-		end)
-	end
-end
-
 function MG.FreezeEntities(force)
 	for _,v in pairs(ents.GetAll()) do
-		if !MG.EntityFreezeList[string.lower(v:GetClass())] == true then continue end
+		if (MG.EntityFreezeList[string.lower(v:GetClass())] != true) then continue end
 		if !force and v.MG_PickedUp then continue end
 		if MG.EnableAntiPropminge and v.MG_Protected then
 			v.MG_Protected = nil
