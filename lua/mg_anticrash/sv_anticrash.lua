@@ -127,13 +127,22 @@ if MG.EnableAntiPropminge then
 		return false
 	end
 
-	hook.Add("OnEntityCreated", "AntiCrash_EnableProtectionMode", function(ent)
-		if (MG.CheckForClass(ent) == false) then return end
-		timer.Simple(0, function()
-			if !IsValid(ent) then return end
-			MG.GhostEntity(ent)
+	if !MG.GhostAllEntities then
+		hook.Add("PlayerSpawnedProp", "AntiCrash_EnableProtectionMode", function(_, _, ent)
+			timer.Simple(0, function()
+				if !IsValid(ent) then return end
+				MG.GhostEntity(ent)
+			end)
 		end)
-	end)
+	else
+		hook.Add("OnEntityCreated", "AntiCrash_EnableProtectionMode", function(ent)
+			if (MG.CheckForClass(ent) == false) then return end
+			timer.Simple(0, function()
+				if !IsValid(ent) then return end
+				MG.GhostEntity(ent)
+			end)
+		end)
+	end
 
 	hook.Add("PhysgunPickup", "AntiCrash_EnableProtectionMode", function(ply, ent)
 		if (MG.CheckForClass(ent) == false) or ent.MG_Protected then return end
