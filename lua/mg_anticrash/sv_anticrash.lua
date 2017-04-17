@@ -112,17 +112,14 @@ if MG.EnableAntiPropminge then
 	end
 
 	function MG.CheckForClass(ent)
-		if !MG.GhostAllEntities then
-			if (ent:GetClass() == "prop_physics" or ent:GetClass() == "prop_physics_multiplayer") then
+		if (!MG.GhostAllEntities and (ent:GetClass() == "prop_physics" or ent:GetClass() == "prop_physics_multiplayer")) then
+			return true
+		elseif MG.GhostAllEntities then
+			if (!MG.UseWhitelist and MG.MingeEntities[string.lower(ent:GetClass())] == true) then
 				return true
-			else
-				return false
+			elseif (MG.UseWhitelist and MG.MingeEntities[string.lower(ent:GetClass())] != true) then
+				return true
 			end
-		end
-		if (!MG.UseWhitelist and MG.MingeEntities[string.lower(ent:GetClass())] == true) then
-			return true
-		elseif (MG.UseWhitelist and MG.MingeEntities[string.lower(ent:GetClass())] != true) then
-			return true
 		end
 		return false
 	end
