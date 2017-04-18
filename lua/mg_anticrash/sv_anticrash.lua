@@ -88,9 +88,18 @@ if MG.EnableAntiPropminge then
 
 	function MG.CheckForStuckingPlayers(ent)
 		if hook.Run("AntiCrash_ShouldCheckForStuckingPlayers", ent) == false then return false end
+		local mins, maxs, check = ent:OBBMins(), ent:OBBMaxs(), false
+		local tr = {start = ent:LocalToWorld(mins), endpos = ent:LocalToWorld(maxs), filter = ent}
+		local trace = util.TraceLine(tr)
+		check = ((trace.Entity:IsPlayer() and trace.Entity:Alive()) or (MG.DisableFreezeInVehicles and trace.Entity:IsVehicle())) or false
+		if check then return check end
+		tr = {start = ent:GetPos(), endpos = ent:GetPos(), filter = ent, mins = ent:OBBMins(), maxs = ent:OBBMaxs()}
+		trace = util.TraceHull(tr)
+		check = ((trace.Entity:IsPlayer() and trace.Entity:Alive()) or (MG.DisableFreezeInVehicles and trace.Entity:IsVehicle())) or false
+		if check then return check end
 		local box = ents.FindInBox(ent:LocalToWorld(ent:OBBMins()), ent:LocalToWorld(ent:OBBMaxs()))
 		for _,v in pairs(box) do
-			if (v:IsPlayer() and v:Alive() or (MG.DisableFreezeInVehicles and v:IsVehicle())) then
+			if ((v:IsPlayer() and v:Alive()) or (MG.DisableFreezeInVehicles and v:IsVehicle())) then
 				return true
 			end
 		end
