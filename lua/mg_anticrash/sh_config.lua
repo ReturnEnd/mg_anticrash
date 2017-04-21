@@ -9,6 +9,7 @@ MG.Sensitivity = 15 -- Adjust.
 MG.EnableAntiPropminge = true -- Disable minging around with props? (Disables collision, when props are unfrozen)
 MG.UseWhitelist = false -- Should we use a whitelist for minging entities instead of a blacklist?
 MG.GhostAllEntities = false -- Should we ghost all entities specified in the table?
+MG.OnlyGhostPropsOnSpawn = false -- Should we only ghost props on spawn?
 MG.EnablePropCollide = false -- Enable collision between two props.
 MG.BlockToolsOnGhostEntities = true -- Block tool usage on ghosted entities?
 MG.AllowWeldWorkaround = true -- Fix problems with the weld-tool?

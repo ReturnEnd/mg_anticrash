@@ -121,19 +121,19 @@ if MG.EnableAntiPropminge then
 	end
 
 	function MG.CheckForClass(ent)
-		if (!MG.GhostAllEntities and (ent:GetClass() == "prop_physics" or ent:GetClass() == "prop_physics_multiplayer")) then
-			return true
-		elseif MG.GhostAllEntities then
-			if (!MG.UseWhitelist and MG.MingeEntities[string.lower(ent:GetClass())] == true) then
+		if MG.GhostAllEntities then
+			if (ent:GetClass() == "prop_physics" or ent:GetClass() == "prop_physics_multiplayer") then
 				return true
-			elseif (MG.UseWhitelist and MG.MingeEntities[string.lower(ent:GetClass())] != true) then
+			end
+		else
+			if (!MG.UseWhitelist and MG.MingeEntities[string.lower(ent:GetClass())] == true) or (MG.UseWhitelist and MG.MingeEntities[string.lower(ent:GetClass())] != true) then
 				return true
 			end
 		end
 		return false
 	end
 
-	if !MG.GhostAllEntities then
+	if !MG.OnlyGhostPropsOnSpawn then
 		hook.Add("PlayerSpawnedProp", "AntiCrash_EnableProtectionMode", function(_, _, ent)
 			timer.Simple(0, function()
 				if !IsValid(ent) then return end
