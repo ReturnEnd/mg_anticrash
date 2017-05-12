@@ -98,7 +98,7 @@ if MG.EnableAntiPropminge then
 		check = ((trace.Entity:IsPlayer() and trace.Entity:Alive()) or (MG.DisableFreezeInVehicles and trace.Entity:IsVehicle())) or false
 		if check then return check end
 		local box = ents.FindInBox(ent:LocalToWorld(ent:OBBMins()), ent:LocalToWorld(ent:OBBMaxs()))
-		for _,v in pairs(box) do
+		for _,v in ipairs(box) do
 			if ((v:IsPlayer() and v:Alive()) or (MG.DisableFreezeInVehicles and v:IsVehicle())) then
 				return true
 			end
@@ -274,7 +274,7 @@ if MG.BlockBigSizeProps_FPP then
 end
 
 function MG.FreezeEntities(force)
-	for _,v in pairs(ents.GetAll()) do
+	for _,v in ipairs(ents.GetAll()) do
 		if (MG.EntityFreezeList[string.lower(v:GetClass())] != true) then continue end
 		if !force and v.MG_PickedUp then continue end
 		if MG.EnableAntiPropminge and v.MG_Protected then
