@@ -313,16 +313,18 @@ if MG.FreezeSpecificEntities then
 end
 
 if MG.FreezeAllPropsOnServerLag then
-	timer.Simple(10, function()
-		local tickrate = 1/engine.TickInterval()
-		local tick = RealTime()
-		local counter = 0
+	local tickrate = 1/engine.TickInterval()
+	local tick = RealTime()
+	local counter = 0
+	local delay = 0
 
+	timer.Simple(10, function()
 		hook.Add("Think", "AntiCrash_FreezeAll", function()
 			local rate = 1 / (RealTime() - tick)
 			if rate < tickrate / MG.Sensitivity then
 				counter = counter + 1
-				if counter >= MG.MaxLongs then
+				if counter >= MG.MaxLongs and delay < CurTime() then
+					delay = CurTime() + MG.FreezeDelay
 					MG.FreezeEntities(true)
 					MsgN("[MG] Froze all props due to server lag.")
 					counter = 0
