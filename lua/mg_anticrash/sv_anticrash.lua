@@ -71,14 +71,29 @@ function MG.CanUnfreeze(ply, ent)
 	return true
 end
 
-function MG.IsTouchingEntity(ent, ent2)
+function MG.IsTouchingEntity(ent, ent2, mask)
 	local pos = ent2:GetPos()
-	local trace = { start = pos, endpos = pos, filter = ent2 }
+	local trace = { start = pos, endpos = pos, filter = ent2, mask = mask or MASK_SOLID }
 	local tr = util.TraceEntity(trace, ent2)
 	if tr.Entity == ent then
 		return true
 	end
 	return false
+end
+
+function MG.CheckForStuckingPlayers(ent)
+	local override_stucking = hook.Run("MG_CheckForStuckingPlayers", ent)
+	if isbool(override_stucking) then return override_stucking end
+	local center, radius, forbidden = ent:LocalToWorld(ent:OBBCenter()), ent:BoundingRadius(), false
+	for _,v in ipairs(ents.FindInSphere(center, radius)) do
+		if v:IsPlayer() and v:Alive() or (MG.DisableFreezeInsideVehicles and v:IsVehicle()) then
+			if MG.IsTouchingEntity(ent, v) then
+				forbidden = true
+			end
+		end
+		if forbidden then break end
+	end
+	return forbidden or false
 end
 
 if MG.CheckForStuckingProps then
@@ -124,37 +139,37 @@ if MG.CheckForStuckingProps then
 	end)
 end
 
+function MG.EnableProtectionMode(ent)
+	if hook.Run("MG_ShouldEnableProtectionMode", ent) == false then return end
+	if MG.BlockToolsOnGhostEntities then
+		ent:SetNWBool("MG_T_Blocked", true)
+	end
+	ent.MG_RenderMode = ent:GetRenderMode()
+	ent:SetRenderMode(RENDERMODE_TRANSALPHA)
+	local color = ent:GetColor()
+	ent.MG_Color = color
+	ent:SetColor(Color(color.r, color.g, color.b, 200))
+	ent.MG_CollisionGroup = ent:GetCollisionGroup()
+	ent:SetCollisionGroup(MG.CollideWithEntities and COLLISION_GROUP_DEBRIS_TRIGGER or COLLISION_GROUP_WORLD)
+	ent:DrawShadow(false)
+	ent:CollisionRulesChanged()
+	hook.Run("MG_OnEnableProtectionMode", ent)
+end
+
+function MG.DisableProtectionMode(ent)
+	if hook.Run("MG_ShouldDisableProtectionMode", ent) == false then return end
+	if MG.BlockToolsOnGhostEntities then
+		ent:SetNWBool("MG_T_Blocked", false)
+	end
+	ent:SetRenderMode(ent.MG_RenderMode or RENDERMODE_NORMAL)
+	ent:SetColor(ent.MG_Color or Color(255, 255, 255, 255))
+	ent:SetCollisionGroup(ent.MG_CollisionGroup or COLLISION_GROUP_NONE)
+	ent:DrawShadow(true)
+	ent:CollisionRulesChanged()
+	hook.Run("MG_OnDisableProtectionMode", ent)
+end
+
 if MG.EnableAntiPropMinge then
-	function MG.EnableProtectionMode(ent)
-		if hook.Run("MG_ShouldEnableProtectionMode", ent) == false then return end
-		if MG.BlockToolsOnGhostEntities then
-			ent:SetNWBool("MG_T_Blocked", true)
-		end
-		ent.MG_RenderMode = ent:GetRenderMode()
-		ent:SetRenderMode(RENDERMODE_TRANSALPHA)
-		local color = ent:GetColor()
-		ent.MG_Color = color
-		ent:SetColor(Color(color.r, color.g, color.b, 200))
-		ent.MG_CollisionGroup = ent:GetCollisionGroup()
-		ent:SetCollisionGroup(MG.CollideWithEntities and COLLISION_GROUP_DEBRIS_TRIGGER or COLLISION_GROUP_WORLD)
-		ent:DrawShadow(false)
-		ent:CollisionRulesChanged()
-		hook.Run("MG_OnEnableProtectionMode", ent)
-	end
-
-	function MG.DisableProtectionMode(ent)
-		if hook.Run("MG_ShouldDisableProtectionMode", ent) == false then return end
-		if MG.BlockToolsOnGhostEntities then
-			ent:SetNWBool("MG_T_Blocked", false)
-		end
-		ent:SetRenderMode(ent.MG_RenderMode or RENDERMODE_NORMAL)
-		ent:SetColor(ent.MG_Color or Color(255, 255, 255, 255))
-		ent:SetCollisionGroup(ent.MG_CollisionGroup or COLLISION_GROUP_NONE)
-		ent:DrawShadow(true)
-		ent:CollisionRulesChanged()
-		hook.Run("MG_OnDisableProtectionMode", ent)
-	end
-
 	if MG.AllowWeldWorkaround then
 		hook.Add("CanTool", "MG_WeldWorkaround", function(ply, tr, tool)
 			if IsValid(tr.Entity) and (tool == "weld" or tool == "precision") then
@@ -177,21 +192,6 @@ if MG.EnableAntiPropMinge then
 				return false
 			end
 		end)
-	end
-
-	function MG.CheckForStuckingPlayers(ent)
-		local override_stucking = hook.Run("MG_CheckForStuckingPlayers", ent)
-		if isbool(override_stucking) then return override_stucking end
-		local center, radius, forbidden = ent:LocalToWorld(ent:OBBCenter()), ent:BoundingRadius(), false
-		for _,v in ipairs(ents.FindInSphere(center, radius)) do
-			if v:IsPlayer() and v:Alive() or (MG.DisableFreezeInsideVehicles and v:IsVehicle()) then
-				if MG.IsTouchingEntity(ent, v) then
-					forbidden = true
-				end
-			end
-			if forbidden then break end
-		end
-		return forbidden or false
 	end
 
 	function MG.GhostEntity(ent)
