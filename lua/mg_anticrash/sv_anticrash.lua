@@ -26,6 +26,7 @@ if !MG.AllowPhysgunReload then
 end
 
 function MG.Notify(ply, typ, length, msg)
+	if hook.Run("MG_Notify", ply, typ, length, msg, MG.DarkRPNotifications) == false then return end
 	if MG.DarkRPNotifications then
 		DarkRP.notify(ply, typ or 0, length or 5, msg)
 	else
@@ -194,8 +195,7 @@ if MG.EnableAntiPropMinge then
 	end
 
 	function MG.GhostEntity(ent)
-		local override_ghosting = hook.Run("MG_GhostEntity", ent)
-		if isbool(override_ghosting) then return override_ghosting end
+		if hook.Run("MG_GhostEntity", ent) == false then return end
 		if FPP and FPP.UnGhost then
 			FPP.UnGhost(ply, ent)
 		end
@@ -307,27 +307,30 @@ if MG.DisableSpecificEntityDamage or MG.DisableVehicleDamage then
 end
 
 if MG.BlockBigSizeProps_FPP then
-	function MG.FixModel(model)
-		local override_name = hook.Run("MG_FixModelName", model)
-		if isbool(override_name) then return override_name end
-		model = tostring(string.lower(model))
-		model = string.Replace(model, "\\", "/")
-		model = string.Replace(model, " ", "_")
-		model = string.Replace(model, ";", "")
-		model = string.gsub(model, "[\\/]+", "/")
-		return model
+	function MG.FixModel(mdl)
+		local override_name = hook.Run("MG_FixModelName", mdl)
+		if isstring(override_name) then return override_name end
+		mdl = tostring(string.lower(mdl))
+		mdl = string.Replace(mdl, "\\", "/")
+		mdl = string.Replace(mdl, " ", "_")
+		mdl = string.Replace(mdl, ";", "")
+		mdl = string.gsub(mdl, "[\\/]+", "/")
+		return mdl
+	end
+
+	function MG.AddToBlacklist(mdl)
+		if (FPP and FPP.BlockedModels[mdl] != true) then
+			FPP.BlockedModels[mdl] = true
+		end
 	end
 
 	hook.Add("PlayerSpawnedProp", "MG_BlockBigSizeProps", function(ply, mdl, ent)
 		local mdl = MG.FixModel(mdl)
 		local phys = ent:GetPhysicsObject()
-		local override_blacklist = hook.Run("MG_AddToBlacklist", ply, mdl, ent, phys)
-		if isbool(override_blacklist) then return override_blacklist end
+		if hook.Run("MG_AddToBlacklist", ply, mdl, ent) == false then return end
 		if IsValid(phys) and phys:GetVolume() then
 			if phys:GetVolume() > math.pow(10, 7) then
-				if type(FPP) == "table" then
-					RunConsoleCommand("FPP_AddBlockedModel", mdl)
-				end
+				MG.AddToBlacklist(mdl)
 				SafeRemoveEntity(ent)
 				if IsValid(ply) then
 					MG.Notify(ply, 0, 8, MG.LanguageStrings[2])
@@ -338,8 +341,7 @@ if MG.BlockBigSizeProps_FPP then
 end
 
 function MG.FreezeEntities(force)
-	local override_freeze = hook.Run("MG_FreezeAllMapEntities", force)
-	if isbool(override_freeze) then return override_freeze end
+	if hook.Run("MG_FreezeAllMapEntities", force) == false then return end
 	for _,v in ipairs(ents.GetAll()) do
 		if !force and v.MG_PickedUp then continue end
 		if (MG.EntityFreezeList[v:GetClass()] != true) then continue end
@@ -357,6 +359,7 @@ end
 
 if MG.EnableFreezeCommand then
 	concommand.Add("mg_freeze", function(ply, cmd, args)
+		if hook.Run("MG_CanForceFreeze", ply, cmd, args) == false then return end
 		if ply:IsAdmin() then
 			MG.FreezeEntities(true)
 		end
@@ -383,22 +386,19 @@ if MG.FreezeAllPropsOnServerLag then
 	local counter = 0
 	local delay = 0
 
-	timer.Simple(10, function()
-		hook.Add("Tick", "MG_FreezeAll", function()
-			local rate = 1 / (RealTime() - tick)
-			if rate < tickrate / MG.Sensitivity then
-				counter = counter + 1
-				if counter >= MG.MaxLongs and delay < CurTime() then
-					delay = CurTime() + MG.FreezeDelay
-					if (hook.Run("MG_ShouldFreezeAllEntitiesOnServerLag") != false) then
-						MG.FreezeEntities(true)
-					end
-					MsgN("[MG] Froze all props due to server lag.")
-					counter = 0
-				end
+	hook.Add("Tick", "MG_FreezeAll", function()
+		local rate = 1 / (RealTime() - tick)
+		if rate < tickrate / MG.Sensitivity then
+			counter = counter + 1
+			if counter >= MG.MaxLongs and delay < CurTime() then
+				delay = CurTime() + MG.FreezeDelay
+				counter = 0
+				if hook.Run("MG_ShouldFreezeAllEntitiesOnServerLag") == false then return end
+				MG.FreezeEntities(true)
+				MsgN("[MG] Froze all props due to server lag.")
 			end
-			tick = RealTime()
-		end)
+		end
+		tick = RealTime()
 	end)
 end
 
