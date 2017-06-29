@@ -12,7 +12,7 @@ if MG.UseNWBools and (!MG.PhysgunWorld or !MG.ToolgunWorld) then
 end
 
 if !MG.PropertyWorld then
-	hook.Add("CanProperty", "MG_BlockPropertyOnWorld", function()
+	hook.Add("CanProperty", "MG_BlockPropertyOnWorld", function(ent)
 		if ent:CreatedByMap() then
 			return false
 		end
@@ -93,7 +93,7 @@ function MG.CheckForStuckingPlayers(ent)
 		end
 		if forbidden then break end
 	end
-	return forbidden or false
+	return forbidden
 end
 
 if MG.CheckForStuckingProps then
