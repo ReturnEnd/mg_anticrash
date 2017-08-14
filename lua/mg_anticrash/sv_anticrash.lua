@@ -187,6 +187,15 @@ if MG.EnableAntiPropMinge then
 	end
 
 	if MG.AllowCollideWorkaround then
+		hook.Add("CanTool", "MG_CollideWorkaround", function(ply, tr, tool)
+			if IsValid(tr.Entity) then
+				local ent = tr.Entity
+				if ent.MG_Protected and tool == "nocollide" then
+					return false
+				end
+			end
+		end)
+
 		hook.Add("CanProperty", "MG_CollideWorkaround", function(ply, prop, ent)
 			if ent.MG_Protected and prop == "collision" then
 				return false
