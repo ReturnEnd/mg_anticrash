@@ -52,6 +52,8 @@ end
 function MG.CanPhysgun(ply, ent)
 	local override_canphysgun = hook.Run("MG_CanPhysgun", ply, ent)
 	if isbool(override_canphysgun) then return override_canphysgun end
+	local override_entity = ent.PhysgunPickup
+	if isfunction(override_entity) then return override_entity(ent, ply, ent) end
 	if MG.CheckForClass(ent) == false or ent.CPPICanPhysgun and !ent:CPPICanPhysgun(ply) then return false end
 	if !MG.PhysgunWorld and ent:CreatedByMap() then return false end
 	return true
@@ -60,6 +62,8 @@ end
 function MG.CanFreeze(ply, ent)
 	local override_canfreeze = hook.Run("MG_CanFreeze", ply, ent)
 	if isbool(override_canfreeze) then return override_canfreeze end
+	local override_entity = ent.OnPhysgunFreeze
+	if isfunction(override_entity) then return override_entity(ent, ply, ent) end
 	if MG.CheckForClass(ent) == false or !ent.MG_Protected then return false end
 	return true
 end
