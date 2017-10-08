@@ -54,10 +54,10 @@ function MG.CanPhysgun(ply, ent)
 	if isbool(override_canphysgun) then return override_canphysgun end
 	if ent.MG_EnableProtection then return true end
 	if ent.MG_DisableProtection then return false end
+	if MG.CheckForClass(ent) == false then return false end
 	local override_entity = ent.PhysgunPickup
 	if isfunction(override_entity) then return override_entity(ent, ply, ent) end
-	if MG.CheckForClass(ent) == false or ent.CPPICanPhysgun and !ent:CPPICanPhysgun(ply) then return false end
-	if !MG.PhysgunWorld and ent:CreatedByMap() then return false end
+	if ent.CPPICanPhysgun and !ent:CPPICanPhysgun(ply) then return false end
 	return true
 end
 
@@ -66,9 +66,8 @@ function MG.CanFreeze(ply, ent)
 	if isbool(override_canfreeze) then return override_canfreeze end
 	if ent.MG_EnableProtection then return true end
 	if ent.MG_DisableProtection then return false end
-	local override_entity = ent.PhysgunPickup
-	if isfunction(override_entity) then return override_entity(ent, ply, ent) end
-	if MG.CheckForClass(ent) == false or !ent.MG_Protected then return false end
+	if MG.CheckForClass(ent) == false then return false end
+	if !ent.MG_Protected then return false end
 	return true
 end
 
