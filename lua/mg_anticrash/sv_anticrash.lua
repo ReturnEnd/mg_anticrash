@@ -179,13 +179,17 @@ end
 if MG.EnableAntiPropMinge then
 	if MG.AllowWeldWorkaround then
 		hook.Add("CanTool", "MG_WeldWorkaround", function(ply, tr, tool)
-			if IsValid(tr.Entity) and (tool == "weld" or tool == "precision") then
-				local ent = tr.Entity
-				if FPP and FPP.canTouchEnt and !FPP.canTouchEnt(trace.Entity, "Toolgun") then return end
+			local ent = tr.Entity
+			if IsValid(ent) and (tool == "weld" or tool == "precision") then
+				if FPP and FPP.canTouchEnt and !FPP.canTouchEnt(tr.Entity, "Toolgun") then return end
 				timer.Simple(0, function()
 					if !IsValid(ent) then return end
+					if MG.CheckForStuckingPlayers(ent) and !ent.MG_Protected then
+						ent.MG_Protected = true
+						MG.EnableProtectionMode(ent)
+					end
 					local phys = ent:GetPhysicsObject()
-					if IsValid(phys) and phys:IsMotionEnabled() then
+					if IsValid(phys) then
 						phys:EnableMotion(false)
 					end
 				end)
@@ -195,8 +199,8 @@ if MG.EnableAntiPropMinge then
 
 	if MG.AllowCollideWorkaround then
 		hook.Add("CanTool", "MG_CollideWorkaround", function(ply, tr, tool)
-			if IsValid(tr.Entity) then
-				local ent = tr.Entity
+			local ent = tr.Entity
+			if IsValid(ent) then
 				if ent.MG_Protected and tool == "nocollide" then
 					return false
 				end
