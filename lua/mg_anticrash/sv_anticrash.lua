@@ -5,8 +5,8 @@ if MG.UseNWBools and (!MG.PhysgunWorld or !MG.ToolgunWorld) then
 		if !ent:CreatedByMap() then return end
 		timer.Simple(0, function()
 			if !IsValid(ent) then return end
-			if !MG.PhysgunWorld then ent:SetNWBool("MG_P_Blocked", true) end
-			if !MG.ToolgunWorld then ent:SetNWBool("MG_T_Blocked_P", true) end
+			if !MG.PhysgunWorld then ent:SetNW2Bool("MG_P_Blocked", true) end
+			if !MG.ToolgunWorld then ent:SetNW2Bool("MG_T_Blocked_P", true) end
 		end)
 	end)
 end
@@ -149,7 +149,7 @@ end
 function MG.EnableProtectionMode(ent)
 	if hook.Run("MG_ShouldEnableProtectionMode", ent) == false then return end
 	if MG.BlockToolsOnGhostEntities then
-		ent:SetNWBool("MG_T_Blocked", true)
+		ent:SetNW2Bool("MG_T_Blocked", true)
 	end
 	ent.MG_RenderMode = ent:GetRenderMode()
 	ent:SetRenderMode(RENDERMODE_TRANSALPHA)
@@ -166,7 +166,7 @@ end
 function MG.DisableProtectionMode(ent)
 	if hook.Run("MG_ShouldDisableProtectionMode", ent) == false then return end
 	if MG.BlockToolsOnGhostEntities then
-		ent:SetNWBool("MG_T_Blocked", false)
+		ent:SetNW2Bool("MG_T_Blocked", false)
 	end
 	ent:SetRenderMode(ent.MG_RenderMode or RENDERMODE_NORMAL)
 	ent:SetColor(ent.MG_Color or Color(255, 255, 255, 255))
