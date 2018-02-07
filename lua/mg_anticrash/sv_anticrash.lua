@@ -27,7 +27,7 @@ end
 
 function MG.Notify(ply, typ, length, msg)
 	if hook.Run("MG_Notify", ply, typ, length, msg, MG.DarkRPNotifications) == false then return end
-	if MG.DarkRPNotifications then
+	if MG.DarkRPNotifications and DarkRP then
 		DarkRP.notify(ply, typ or 0, length or 5, msg)
 	else
 		ply:ChatPrint(msg)
@@ -35,14 +35,15 @@ function MG.Notify(ply, typ, length, msg)
 end
 
 function MG.CheckForClass(ent)
-	local override_checking = hook.Run("MG_CheckForClass", ent, ent:GetClass())
+	local class = ent:GetClass()
+	local override_checking = hook.Run("MG_CheckForClass", ent, class)
 	if isbool(override_checking) then return override_checking end
 	if MG.GhostAllEntities then
-		if string.find(ent:GetClass(), "prop_physics") then
+		if class == "prop_physics" or class == "prop_physics_multiplayer" then
 			return true
 		end
 	else
-		if (!MG.UseWhitelist and MG.MingeEntities[ent:GetClass()] == true) or (MG.UseWhitelist and MG.MingeEntities[ent:GetClass()] != true) then
+		if (!MG.UseWhitelist and MG.MingeEntities[class] == true) or (MG.UseWhitelist and MG.MingeEntities[class] != true) then
 			return true
 		end
 	end
@@ -80,7 +81,7 @@ end
 
 function MG.IsTouchingEntity(ent, ent2, mask)
 	local pos = ent2:GetPos()
-	local trace = { start = pos, endpos = pos, filter = ent2, mask = mask or MASK_SOLID }
+	local trace = {start = pos, endpos = pos, filter = ent2, mask = mask or MASK_SOLID}
 	local tr = util.TraceEntity(trace, ent2)
 	if tr.Entity == ent then
 		return true
@@ -148,6 +149,7 @@ end
 
 function MG.EnableProtectionMode(ent)
 	if hook.Run("MG_ShouldEnableProtectionMode", ent) == false then return end
+	if ent:GetNW2Bool("MG_Disabled") then return end
 	if MG.BlockToolsOnGhostEntities then
 		ent:SetNW2Bool("MG_T_Blocked", true)
 	end
@@ -159,7 +161,6 @@ function MG.EnableProtectionMode(ent)
 	ent.MG_CollisionGroup = ent:GetCollisionGroup()
 	ent:SetCollisionGroup(MG.CollideWithEntities and COLLISION_GROUP_DEBRIS_TRIGGER or COLLISION_GROUP_WORLD)
 	ent:DrawShadow(false)
-	ent:CollisionRulesChanged()
 	hook.Run("MG_OnEnableProtectionMode", ent)
 end
 
@@ -172,7 +173,6 @@ function MG.DisableProtectionMode(ent)
 	ent:SetColor(ent.MG_Color or Color(255, 255, 255, 255))
 	ent:SetCollisionGroup(ent.MG_CollisionGroup or COLLISION_GROUP_NONE)
 	ent:DrawShadow(true)
-	ent:CollisionRulesChanged()
 	hook.Run("MG_OnDisableProtectionMode", ent)
 end
 
@@ -380,7 +380,7 @@ end
 if MG.EnableFreezeCommand then
 	concommand.Add("mg_freeze", function(ply, cmd, args)
 		if hook.Run("MG_CanForceFreeze", ply, cmd, args) == false then return end
-		if ply:IsAdmin() then
+		if MG.FreezeGroups[ply:GetUserGroup()] == true then
 			MG.FreezeEntities(true)
 		end
 	end)
@@ -401,13 +401,14 @@ if MG.FreezeSpecificEntities then
 end
 
 if MG.FreezeAllPropsOnServerLag then
-	local tickrate = 1/engine.TickInterval()
+	local tickrate = 1 / engine.TickInterval()
 	local tick = RealTime()
 	local counter = 0
 	local delay = 0
 
 	hook.Add("Tick", "MG_FreezeAll", function()
-		local rate = 1 / (RealTime() - tick)
+		local real_time = RealTime()
+		local rate = 1 / (real_time - tick)
 		if rate < tickrate / MG.Sensitivity then
 			counter = counter + 1
 			if counter >= MG.MaxLongs and delay < CurTime() then
@@ -418,7 +419,7 @@ if MG.FreezeAllPropsOnServerLag then
 				MsgN("[MG] Froze all props due to server lag.")
 			end
 		end
-		tick = RealTime()
+		tick = real_time
 	end)
 end
 

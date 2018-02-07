@@ -1,5 +1,7 @@
 -- Dont edit this file without knowing what you are doing!
 
+include("mg_anticrash/sh_config.lua")
+
 hook.Add("PhysgunPickup", "MG_BlockPhysgun", function(ply, ent)
 	if hook.Run("MG_CanPhysGun", ply, ent) == false then return end
 	if ent:GetNW2Bool("MG_P_Blocked") or (SERVER and ent:CreatedByMap()) then
@@ -14,5 +16,81 @@ hook.Add("CanTool", "MG_BlockToolgun", function(ply, tr, tool)
 		return false
 	end
 end)
+
+if MG.EnableAntiPropMinge and MG.EnableGhostingCommands then
+	properties.Add("MG_UnghostProp", {
+		MenuLabel = "Ghosting deaktivieren",
+		Order = 10000,
+		MenuIcon = "icon16/shield_delete.png",
+		Filter = function(self, ent, ply)
+			if !IsValid(ent) or !MG.ProtectGroups[ply:GetUserGroup()] != true then return false end
+			local class = ent:GetClass()
+			if ent:GetNW2Bool("MG_Disabled") then return end
+			if MG.GhostAllEntities and class != "prop_phyiscs" and class != "prop_physics_multiplayer" then return false end
+			if MG.UseWhitelist and MG.MingeEntities[class] == true then return false end
+			if !MG.UseWhitelist and MG.MingeEntities[class] != true then return false end
+			return true
+		end,
+		Action = function(self, ent)
+			self:MsgStart()
+				net.WriteEntity(ent)
+			self:MsgEnd()
+		end,
+		Receive = function(self, length, player)
+			local ent = net.ReadEntity()
+			if !IsValid(ent) or !MG.ProtectGroups[player:GetUserGroup()] != true then return false end
+			local class = ent:GetClass()
+			if ent:GetNW2Bool("MG_Disabled") then return end
+			if MG.GhostAllEntities and class != "prop_phyiscs" and class != "prop_physics_multiplayer" then return false end
+			if MG.UseWhitelist and MG.MingeEntities[class] == true then return false end
+			if !MG.UseWhitelist and MG.MingeEntities[class] != true then return false end
+			ent:SetNW2Bool("MG_Disabled", true)
+			if ent.MG_Protected then
+				ent.MG_Protected = false
+				MG.DisableProtectionMode(ent)
+			end
+			MG.Notify(player, 0, 4, MG.LanguageStrings[4])
+		end
+	})
+
+	properties.Add("MG_GhostProp", {
+		MenuLabel = "Ghosting aktivieren",
+		Order = 10000,
+		MenuIcon = "icon16/shield.png",
+		Filter = function(self, ent, ply)
+			if !IsValid(ent) or !MG.ProtectGroups[ply:GetUserGroup()] != true then return false end
+			local class = ent:GetClass()
+			if !ent:GetNW2Bool("MG_Disabled") then return end
+			if MG.GhostAllEntities and class != "prop_phyiscs" and class != "prop_physics_multiplayer" then return false end
+			if MG.UseWhitelist and MG.MingeEntities[class] == true then return false end
+			if !MG.UseWhitelist and MG.MingeEntities[class] != true then return false end
+			return true
+		end,
+		Action = function(self, ent)
+			self:MsgStart()
+				net.WriteEntity(ent)
+			self:MsgEnd()
+		end,
+		Receive = function(self, length, player)
+			local ent = net.ReadEntity()
+			if !IsValid(ent) or !MG.ProtectGroups[player:GetUserGroup()] != true then return false end
+			local class = ent:GetClass()
+			if !ent:GetNW2Bool("MG_Disabled") then return end
+			if MG.GhostAllEntities and class != "prop_phyiscs" and class != "prop_physics_multiplayer" then return false end
+			if MG.UseWhitelist and MG.MingeEntities[class] == true then return false end
+			if !MG.UseWhitelist and MG.MingeEntities[class] != true then return false end
+			ent:SetNW2Bool("MG_Disabled", false)
+			if MG.CheckForStuckingPlayers(ent) and !ent.MG_Protected then
+				ent.MG_Protected = true
+				MG.EnableProtectionMode(ent)
+			end
+			local phys = ent:GetPhysicsObject()
+			if IsValid(phys) then
+				phys:EnableMotion(false)
+			end
+			MG.Notify(player, 0, 4, MG.LanguageStrings[5])
+		end
+	})
+end
 
 print("MG: AntiCrash shared initialised")
