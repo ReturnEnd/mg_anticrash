@@ -370,6 +370,7 @@ function MG.FreezeEntities(force)
 			v.MG_Protected = nil
 			MG.DisableProtectionMode(v)
 		end
+		if v:GetNW2Bool("MG_Disabled") then continue end
 		local phys = v:GetPhysicsObject()
 		if IsValid(phys) then
 			phys:EnableMotion(false)

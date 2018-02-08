@@ -89,4 +89,8 @@ MG.LanguageStrings = { -- Translate the addon! (There isn't much to be translate
 	"There is a player stuck in this prop!",
 	"This prop is now blocked. Thank you!",
 	"The server wants to stay online, buddy.",
+	"This prop is no longer protected.",
+	"This prop is protected again.",
+	"Disable protection for this prop",
+	"Enable back protection for this prop",
 }
