@@ -21,7 +21,7 @@ if MG.EnableAntiPropMinge and MG.EnableGhostingCommands then
 		Order = 10000,
 		MenuIcon = "icon16/shield_delete.png",
 		Filter = function(self, ent, ply)
-			if !IsValid(ent) or !MG.ProtectGroups[ply:GetUserGroup()] != true then return false end
+			if !IsValid(ent) or MG.ProtectGroups[ply:GetUserGroup()] != true then return false end
 			local class = ent:GetClass()
 			if ent:GetNW2Bool("MG_Disabled") then return false end
 			if MG.GhostAllEntities and class != "prop_phyiscs" and class != "prop_physics_multiplayer" then return false end
@@ -36,7 +36,7 @@ if MG.EnableAntiPropMinge and MG.EnableGhostingCommands then
 		end,
 		Receive = function(self, length, player)
 			local ent = net.ReadEntity()
-			if !IsValid(ent) or !MG.ProtectGroups[player:GetUserGroup()] != true then return false end
+			if !IsValid(ent) or MG.ProtectGroups[player:GetUserGroup()] != true then return false end
 			local class = ent:GetClass()
 			if ent:GetNW2Bool("MG_Disabled") then return false end
 			if MG.GhostAllEntities and class != "prop_phyiscs" and class != "prop_physics_multiplayer" then return false end
@@ -56,7 +56,7 @@ if MG.EnableAntiPropMinge and MG.EnableGhostingCommands then
 		Order = 10000,
 		MenuIcon = "icon16/shield.png",
 		Filter = function(self, ent, ply)
-			if !IsValid(ent) or !MG.ProtectGroups[ply:GetUserGroup()] != true then return false end
+			if !IsValid(ent) or MG.ProtectGroups[ply:GetUserGroup()] != true then return false end
 			if !ent:GetNW2Bool("MG_Disabled") then return false end
 			local class = ent:GetClass()
 			if MG.GhostAllEntities and class != "prop_phyiscs" and class != "prop_physics_multiplayer" then return false end
@@ -71,7 +71,7 @@ if MG.EnableAntiPropMinge and MG.EnableGhostingCommands then
 		end,
 		Receive = function(self, length, player)
 			local ent = net.ReadEntity()
-			if !IsValid(ent) or !MG.ProtectGroups[player:GetUserGroup()] != true then return false end
+			if !IsValid(ent) or MG.ProtectGroups[player:GetUserGroup()] != true then return false end
 			if !ent:GetNW2Bool("MG_Disabled") then return false end
 			local class = ent:GetClass()
 			if MG.GhostAllEntities and class != "prop_phyiscs" and class != "prop_physics_multiplayer" then return false end
