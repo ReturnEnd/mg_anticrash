@@ -92,5 +92,5 @@ MG.LanguageStrings = { -- Translate the addon! (There isn't much to be translate
 	"This prop is no longer protected.",
 	"This prop is protected again.",
 	"Disable protection for this prop",
-	"Enable back protection for this prop",
+	"Enable protection for this prop",
 }

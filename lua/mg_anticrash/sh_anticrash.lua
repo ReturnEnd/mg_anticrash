@@ -17,7 +17,7 @@ end)
 
 if MG.EnableAntiPropMinge and MG.EnableGhostingCommands then
 	properties.Add("MG_UnghostProp", {
-		MenuLabel = MG.LanguageStrings[7],
+		MenuLabel = MG.LanguageStrings[6],
 		Order = 10000,
 		MenuIcon = "icon16/shield_delete.png",
 		Filter = function(self, ent, ply)
@@ -52,7 +52,7 @@ if MG.EnableAntiPropMinge and MG.EnableGhostingCommands then
 	})
 
 	properties.Add("MG_GhostProp", {
-		MenuLabel = MG.LanguageStrings[6],
+		MenuLabel = MG.LanguageStrings[7],
 		Order = 10000,
 		MenuIcon = "icon16/shield.png",
 		Filter = function(self, ent, ply)
