@@ -362,7 +362,7 @@ end
 
 function MG.FreezeEntities(force)
 	if hook.Run("MG_FreezeAllMapEntities", force) == false then return end
-	for _,v in ipairs(ents.GetAll()) do
+	for k, v in ipairs(ents.GetAll()) do
 		if !force and v.MG_PickedUp then continue end
 		if (MG.EntityFreezeList[v:GetClass()] != true) then continue end
 		if hook.Run("MG_CanFreezeEntity", v, k, force) == false then return end
