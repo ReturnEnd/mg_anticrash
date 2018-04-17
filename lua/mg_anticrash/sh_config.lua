@@ -6,6 +6,7 @@ MG = MG or {}
 -- Propfreeze settings
 
 MG.FreezeAllPropsOnServerLag = true -- Freeze props on (heavy) server lag.
+MG.FreezePenetratingProps = true -- Freezes all physic entities, colliding with something, regardless of the settings configured in the MG.EntityFreezeList-table.
 MG.MaxLongs = 3 -- Minimum lag checks before freezing all props specified in the MG.EntityFreezeList-table. 
 MG.Sensitivity = 10 -- Sensitivity of the lag detection.
 MG.FreezeDelay = 0.1 -- Minimum delay between two freezes.

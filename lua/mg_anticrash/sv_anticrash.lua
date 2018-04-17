@@ -181,7 +181,7 @@ if MG.EnableAntiPropMinge then
 		hook.Add("CanTool", "MG_WeldWorkaround", function(ply, tr, tool)
 			local ent = tr.Entity
 			if IsValid(ent) and (tool == "weld" or tool == "precision") then
-				if FPP and FPP.canTouchEnt and !FPP.canTouchEnt(tr.Entity, "Toolgun") then return end
+				if FPP and FPP.canTouchEnt and !FPP.canTouchEnt(ent, "Toolgun") then return false end
 				timer.Simple(0, function()
 					if !IsValid(ent) then return end
 					if MG.CheckForStuckingPlayers(ent) and !ent.MG_Protected then
@@ -364,7 +364,10 @@ function MG.FreezeEntities(force)
 	if hook.Run("MG_FreezeAllMapEntities", force) == false then return end
 	for k, v in ipairs(ents.GetAll()) do
 		if !force and v.MG_PickedUp then continue end
-		if (MG.EntityFreezeList[v:GetClass()] != true) then continue end
+		local phys = v:GetPhysicsObject()
+		if !IsValid(phys) then continue end
+		local phys_penetrating = MG.FreezePenetratingProps and phys:IsPenetrating()
+		if (MG.EntityFreezeList[v:GetClass()] != true and !phys_penetrating) then continue end
 		if hook.Run("MG_CanFreezeEntity", v, k, force) == false then return end
 		if v.MG_Protected then
 			if (!force and MG.CheckForStuckingPlayers(v)) then continue end
@@ -372,10 +375,7 @@ function MG.FreezeEntities(force)
 			MG.DisableProtectionMode(v)
 		end
 		if v:GetNW2Bool("MG_Disabled") then continue end
-		local phys = v:GetPhysicsObject()
-		if IsValid(phys) then
-			phys:EnableMotion(false)
-		end
+		phys:EnableMotion(false)
 	end
 end
 
