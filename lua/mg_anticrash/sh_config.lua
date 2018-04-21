@@ -21,7 +21,7 @@ MG.GhostAllEntities = false -- Ghosts all entities specified in the MG.MingeEnti
 MG.UseWhitelist = false -- Uses a whitelist for the MG.MingeEntities-table instead of a blacklist.
 MG.OnlyGhostPropsOnSpawn = false -- Ghosts all entities instead of just props on spawn. (Enabling this ghosts all entities in the MG.MingeEntities-table on spawn)
 MG.BlockToolsOnGhostEntities = true -- Blocks tool usage on ghosted entities. (Excluding tools defined in the MG.AllowedTools-table)
-MG.AllowWeldWorkaround = true -- Fixes occuring problems with the weld-tool. (Don't edit this, if you don't know what is meant)
+MG.AllowWeldWorkaround = true -- Fixes occuring problems with the weld-tool. (Don't edit this, if you don't know what is meant) (Still players can abuse an exploit within the weld tool, but this is not fixable)
 MG.AllowCollideWorkaround = true -- Fixes occuring problems with nocollide-properties. (Don't edit this, if you don't know what is meant)
 MG.DisableFreezeInsideVehicles = false -- Disables freezing of entities inside of a vehicle.
 
@@ -51,7 +51,7 @@ MG.DarkRPNotifications = true -- Use the DarkRP-notifications system instead of 
 MG.MingeEntities = { -- Table of entities the ghost protection should deal with.(Only works with MG.GhostAllEntities set to true)
 	["prop_physics"] = true, -- Removing this with MG.GhostAllEntities set to true, returns in props not being ghosted properly anymore.
 	["prop_physics_multiplayer"] = true, -- Used on rp_evocity_v33x as map props.
-	["prop_ragdoll"] = true,
+	["prop_ragdoll"] = true, -- Remove this if you run DarkRP!
 }
 
 MG.AllowedTools = { -- Table of tools allowed to be used on ghosted entities. (Only works with MG.BlockToolsOnGhostEntities is set to true)

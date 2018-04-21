@@ -182,6 +182,7 @@ if MG.EnableAntiPropMinge then
 			local ent = tr.Entity
 			if IsValid(ent) and (tool == "weld" or tool == "precision") then
 				if FPP and FPP.canTouchEnt and !FPP.canTouchEnt(ent, "Toolgun") then return false end
+				if MG.CheckForClass(ent) == false then return end
 				timer.Simple(0, function()
 					if !IsValid(ent) then return end
 					if MG.CheckForStuckingPlayers(ent) and !ent.MG_Protected then
