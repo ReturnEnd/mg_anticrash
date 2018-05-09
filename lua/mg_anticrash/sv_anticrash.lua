@@ -83,6 +83,8 @@ function MG.IsTouchingEntity(ent, ent2, mask)
 	local pos = ent2:GetPos()
 	local trace = {start = pos, endpos = pos, filter = ent2, mask = mask or MASK_SOLID}
 	local tr = util.TraceEntity(trace, ent2)
+	local override_touchentity = hook.Run("MG_CanTouchEntity", ent, ent2, pos, tr, trace)
+	if isbool(override_touchentity) then return override_touchentity end
 	if tr.Entity == ent then
 		return true
 	end
@@ -181,7 +183,7 @@ if MG.EnableAntiPropMinge then
 		hook.Add("CanTool", "MG_WeldWorkaround", function(ply, tr, tool)
 			local ent = tr.Entity
 			if IsValid(ent) and (tool == "weld" or tool == "precision") then
-				if FPP and FPP.canTouchEnt and !FPP.canTouchEnt(ent, "Toolgun") then return false end
+				if FPP and FPP.plyCanTouchEnt and !FPP.plyCanTouchEnt(ply, ent, "Toolgun") then return false end
 				if MG.CheckForClass(ent) == false then return end
 				timer.Simple(0, function()
 					if !IsValid(ent) then return end
