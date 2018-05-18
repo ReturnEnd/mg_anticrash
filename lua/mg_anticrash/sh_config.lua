@@ -17,7 +17,7 @@ MG.EnableAntiPropMinge = true -- Prevents minging around with props. (Ghosts pro
 
 -- Config options below here only work with MG.EnableAntiPropMinge set to true, some may still work, but most of them won't!
 MG.CollideWithEntities = false -- Enables collision between two props. (Still collisions with players is disabled)
-MG.GhostAllEntities = false -- Ghosts all entities specified in the MG.MingeEntities-table instead of just props. (If you want to ghost other entities on spawn as well, turn the config-setting MG.OnlyGhostPropsOnSpawn to true)
+MG.GhostAllEntities = true -- Ghosts all entities specified in the MG.MingeEntities-table instead of just props. (If you want to ghost other entities on spawn as well, turn the config-setting MG.OnlyGhostPropsOnSpawn to true)
 MG.UseWhitelist = false -- Uses a whitelist for the MG.MingeEntities-table instead of a blacklist.
 MG.OnlyGhostPropsOnSpawn = false -- Ghosts all entities instead of just props on spawn. (Enabling this ghosts all entities in the MG.MingeEntities-table on spawn)
 MG.BlockToolsOnGhostEntities = true -- Blocks tool usage on ghosted entities. (Excluding tools defined in the MG.AllowedTools-table)

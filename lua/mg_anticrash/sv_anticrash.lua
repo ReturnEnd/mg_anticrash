@@ -38,7 +38,7 @@ function MG.CheckForClass(ent)
 	local class = ent:GetClass()
 	local override_checking = hook.Run("MG_CheckForClass", ent, class)
 	if isbool(override_checking) then return override_checking end
-	if MG.GhostAllEntities then
+	if !MG.GhostAllEntities then
 		if class == "prop_physics" or class == "prop_physics_multiplayer" then
 			return true
 		end
@@ -131,7 +131,7 @@ if MG.CheckForStuckingProps then
 		end
 	end
 
-	hook.Add(!MG.EnableAntiPropMinge and "OnEntityCreated" or "MG_OnEntityCreated", "MG_CheckForStuckingProps", function(ent)
+	hook.Add(MG.EnableAntiPropMinge and !MG.OnlyGhostPropsOnSpawn and "MG_OnEntityCreated" or "OnEntityCreated", "MG_CheckForStuckingProps", function(ent)
 		timer.Simple(0, function()
 			if !IsValid(ent) then return end
 			MG.CheckForProps(ent.CPPIGetOwner and ent:CPPIGetOwner() or NULL, ent)
