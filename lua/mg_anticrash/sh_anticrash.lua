@@ -59,7 +59,7 @@ if MG.EnableAntiPropMinge and MG.EnableGhostingCommands then
 			if !IsValid(ent) or MG.ProtectGroups[ply:GetUserGroup()] != true then return false end
 			if !ent:GetNW2Bool("MG_Disabled") then return false end
 			local class = ent:GetClass()
-			if MG.GhostAllEntities and class != "prop_phyiscs" and class != "prop_physics_multiplayer" then return false end
+			if !MG.GhostAllEntities and class != "prop_phyiscs" and class != "prop_physics_multiplayer" then return false end
 			if MG.UseWhitelist and MG.MingeEntities[class] == true then return false end
 			if !MG.UseWhitelist and MG.MingeEntities[class] != true then return false end
 			return true
