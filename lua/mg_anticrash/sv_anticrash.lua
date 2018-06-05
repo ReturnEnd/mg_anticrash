@@ -1,17 +1,17 @@
 -- Dont edit this file without knowing what you are doing!
 
-if MG.UseNWBools and (!MG.PhysgunWorld or !MG.ToolgunWorld) then
+if MG.UseNWBools and (!MG.AllowPhysgunOnWorld or !MG.AllowToolgunOnWorld) then
 	hook.Add("OnEntityCreated", "MG_BlockWorldEntities", function(ent)
 		if !ent:CreatedByMap() then return end
 		timer.Simple(0, function()
 			if !IsValid(ent) then return end
-			if !MG.PhysgunWorld then ent:SetNW2Bool("MG_P_Blocked", true) end
-			if !MG.ToolgunWorld then ent:SetNW2Bool("MG_T_Blocked_P", true) end
+			if !MG.AllowPhysgunOnWorld then ent:SetNW2Bool("MG_P_Blocked", true) end
+			if !MG.AllowToolgunOnWorld then ent:SetNW2Bool("MG_T_Blocked_P", true) end
 		end)
 	end)
 end
 
-if !MG.PropertyWorld then
+if !MG.AllowPropertyOnWorld then
 	hook.Add("CanProperty", "MG_BlockPropertyOnWorld", function(ent)
 		if ent:CreatedByMap() then
 			return false
